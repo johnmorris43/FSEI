@@ -1,4 +1,8 @@
+using FSEI.Domain.Avionics;
+
 namespace FSEI.Domain.Aircraft;
+
+
 
 public class AircraftConfiguration
 {
@@ -11,4 +15,5 @@ public class AircraftConfiguration
     public string? Notes { get; set; }
 
     public required Variant Variant { get; set; }
+    public ICollection<ConfigurationAvionics> ConfigurationAvionics { get; set; } = [];
 }
