@@ -37,6 +37,40 @@ public class EvaluationComponentAssessment
         Score = score;
     }
 
+    public void ValidateMethodologyVersion(
+        EvaluationMethodologyVersion evaluationMethodologyVersion)
+    {
+        if (EvaluationComponent.EvaluationMethodologyVersionId
+            != evaluationMethodologyVersion.EvaluationMethodologyVersionId)
+        {
+            throw new InvalidOperationException(
+                $"Component '{EvaluationComponent.Name}' does not belong to " +
+                $"methodology version {evaluationMethodologyVersion.EvaluationMethodologyVersionId}.");
+        }
+    }
+    
+    public void ValidateEvaluationAssignment()
+    {
+        var hasSystemsDepthEvaluation = SystemsDepthEvaluationId.HasValue;
+        var hasAvionicsEvaluation = AvionicsEvaluationId.HasValue;
+
+        if (hasSystemsDepthEvaluation == hasAvionicsEvaluation)
+        {
+            throw new InvalidOperationException(
+                "An evaluation component assessment must belong to exactly one evaluation.");
+        }
+    }
+    
+    public void Validate()
+    {
+        ValidateEvaluationAssignment();
+
+        var methodologyVersion = SystemsDepthEvaluation is not null
+            ? SystemsDepthEvaluation.EvaluationMethodologyVersion
+            : AvionicsEvaluation!.EvaluationMethodologyVersion;
+
+        ValidateMethodologyVersion(methodologyVersion);
+    }
     public required EvaluationComponent EvaluationComponent { get; set; }
     
     public int? SystemsDepthEvaluationId { get; set; }
