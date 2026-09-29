@@ -3,12 +3,10 @@ namespace FSEI.Domain.Evaluations;
 
 public class SystemsDepthEvaluation
 {
-    private int? _electricalSystems;
-    private int? _hydraulicPneumaticSystems;
-    private int? _fmsNavigationDepth;
-    private int? _failuresAbnormalProcedures;
-    private int? _proceduralFidelity;
+    
     public int SystemsDepthEvaluationId { get; set; }
+    
+    public int EvaluationMethodologyVersionId { get; set; }
 
     public int EvaluationScopeId { get; set; }
     
@@ -18,39 +16,7 @@ public class SystemsDepthEvaluation
 
     public int? AircraftConfigurationId { get; set; }
 
-    public int? ElectricalSystems
-    {
-        get => _electricalSystems;
-        set => _electricalSystems = ValidateScore(value, 20, nameof(ElectricalSystems));
-    }
-
-    public int? HydraulicPneumaticSystems
-    {
-        get => _hydraulicPneumaticSystems;
-        set => _hydraulicPneumaticSystems =
-            ValidateScore(value, 20, nameof(HydraulicPneumaticSystems));
-    }
-
-    public int? FmsNavigationDepth
-    {
-        get => _fmsNavigationDepth;
-        set => _fmsNavigationDepth =
-            ValidateScore(value, 20, nameof(FmsNavigationDepth));
-    }
-
-    public int? FailuresAbnormalProcedures
-    {
-        get => _failuresAbnormalProcedures;
-        set => _failuresAbnormalProcedures =
-            ValidateScore(value, 20, nameof(FailuresAbnormalProcedures));
-    }
-
-    public int? ProceduralFidelity
-    {
-        get => _proceduralFidelity;
-        set => _proceduralFidelity =
-            ValidateScore(value, 20, nameof(ProceduralFidelity));
-    }
+    
     public int? SystemsDepthScore
     {
         get
@@ -92,7 +58,7 @@ public class SystemsDepthEvaluation
     public AircraftConfiguration? AircraftConfiguration { get; set; }
     public required EvaluationScope EvaluationScope { get; set; }
     public ICollection<EvaluationSource> Sources { get; set; } = [];
-    public ICollection<SystemsDepthComponentAssessment> ComponentAssessments { get; set; } = [];
+    //public ICollection<SystemsDepthComponentAssessment> ComponentAssessments { get; set; } = [];
     
     private static int? ValidateScore(int? score, int maximum, string propertyName)
     {
@@ -113,4 +79,6 @@ public class SystemsDepthEvaluation
     }
     
     public ICollection<EvaluationComponentAssessment> Assessments { get; set; } = [];
+    
+    public required EvaluationMethodologyVersion EvaluationMethodologyVersion { get; set; }
 }
