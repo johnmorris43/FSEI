@@ -58,25 +58,8 @@ public class SystemsDepthEvaluation
     public AircraftConfiguration? AircraftConfiguration { get; set; }
     public required EvaluationScope EvaluationScope { get; set; }
     public ICollection<EvaluationSource> Sources { get; set; } = [];
-    //public ICollection<SystemsDepthComponentAssessment> ComponentAssessments { get; set; } = [];
     
-    private static int? ValidateScore(int? score, int maximum, string propertyName)
-    {
-        if (score is null)
-        {
-            return null;
-        }
-
-        if (score < 0 || score > maximum)
-        {
-            throw new ArgumentOutOfRangeException(
-                propertyName,
-                score,
-                $"Score must be between 0 and {maximum}.");
-        }
-
-        return score;
-    }
+    
     
     public ICollection<EvaluationComponentAssessment> Assessments { get; set; } = [];
     
