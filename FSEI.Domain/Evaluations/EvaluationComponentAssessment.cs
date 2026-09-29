@@ -61,15 +61,11 @@ public class EvaluationComponentAssessment
         }
     }
     
-    public void Validate()
+    public void Validate(
+        EvaluationMethodologyVersion evaluationMethodologyVersion)
     {
         ValidateEvaluationAssignment();
-
-        var methodologyVersion = SystemsDepthEvaluation is not null
-            ? SystemsDepthEvaluation.EvaluationMethodologyVersion
-            : AvionicsEvaluation!.EvaluationMethodologyVersion;
-
-        ValidateMethodologyVersion(methodologyVersion);
+        ValidateMethodologyVersion(evaluationMethodologyVersion);
     }
     public required EvaluationComponent EvaluationComponent { get; set; }
     

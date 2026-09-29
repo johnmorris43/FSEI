@@ -59,7 +59,40 @@ public class SystemsDepthEvaluation
     public required EvaluationScope EvaluationScope { get; set; }
     public ICollection<EvaluationSource> Sources { get; set; } = [];
     
-    
+    public void ValidateEvaluationTarget()
+    {
+        var targetCount = 0;
+
+        if (AircraftId.HasValue)
+            targetCount++;
+
+        if (VariantId.HasValue)
+            targetCount++;
+
+        if (AircraftConfigurationId.HasValue)
+            targetCount++;
+
+        if (targetCount != 1)
+        {
+            throw new InvalidOperationException(
+                "A systems depth evaluation must target exactly one aircraft, variant, or aircraft configuration.");
+        }
+
+        var targetMatchesScope = EvaluationScope.Code switch
+        {
+            "AIRCRAFT_FAMILY" => AircraftId.HasValue,
+            "VARIANT" => VariantId.HasValue,
+            "CONFIGURATION" => AircraftConfigurationId.HasValue,
+            _ => throw new InvalidOperationException(
+                $"Unknown evaluation scope code '{EvaluationScope.Code}'.")
+        };
+
+        if (!targetMatchesScope)
+        {
+            throw new InvalidOperationException(
+                $"The selected evaluation target does not match evaluation scope '{EvaluationScope.Name}'.");
+        }
+    }
     
     public ICollection<EvaluationComponentAssessment> Assessments { get; set; } = [];
     
