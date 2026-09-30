@@ -134,6 +134,20 @@ public class EvaluationComponentAssessmentTests
             () => assessment.ValidateMethodologyVersion(
                 component.EvaluationMethodologyVersion));
     }
+   
+    [Test]
+    public void SetScore_WhenScoreIsBelowZero_ThrowsException()
+    {
+        var component = CreateComponent();
+
+        var assessment = new EvaluationComponentAssessment
+        {
+            EvaluationComponent = component
+        };
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => assessment.SetScore(-1));
+    }
     
     private static EvaluationComponent CreateComponent(
         int maximumScore = 20)
