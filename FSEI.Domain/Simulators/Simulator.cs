@@ -1,4 +1,4 @@
-namespace FSEI.Domain.Simulator;
+namespace FSEI.Domain.Simulators;
 using FSEI.Domain.Platforms;
 
 public class Simulator
@@ -13,6 +13,8 @@ public class Simulator
     
     public required SimulatorStatus SimulatorStatus { get; set; }
     public required SimulatorFamily SimulatorFamily { get; set; }
+    
+    public ICollection<SimulatorRelease> Releases { get; set; } = [];
     
     public ICollection<SimulatorOperatingSystemCompatibility> SimulatorOperatingSystemCompatibilities { get; set; } =
         [];

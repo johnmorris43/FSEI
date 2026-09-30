@@ -1,4 +1,4 @@
-namespace FSEI.Domain.Simulator;
+namespace FSEI.Domain.Simulators;
 
 public class SimulatorStatus
 {
