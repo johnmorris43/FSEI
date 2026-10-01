@@ -22,6 +22,24 @@ public class OfferOptionTests
 
         Assert.Throws<InvalidOperationException>(() => option.Validate());
     }
+    
+    [Test]
+    public void Validate_WhenAcquisitionTypeMatches_DoesNotThrow()
+    {
+        var option = CreateOfferOption();
+
+        Assert.DoesNotThrow(() => option.Validate());
+    }
+
+    [Test]
+    public void Validate_WhenAcquisitionTypeDoesNotMatch_ThrowsInvalidOperationException()
+    {
+        var option = CreateOfferOption();
+
+        option.AcquisitionTypeId = 2;
+
+        Assert.Throws<InvalidOperationException>(() => option.Validate());
+    }
 
     private static OfferOption CreateOfferOption()
     {
@@ -55,8 +73,16 @@ public class OfferOptionTests
             Storefront = storefront
         };
 
+        var acquisitionType = new AcquisitionType
+        {
+            AcquisitionTypeId = 1,
+            Code = "SUBSCRIPTION",
+            Name = "Subscription"
+        };
         return new OfferOption
         {
+            AcquisitionTypeId = acquisitionType.AcquisitionTypeId,
+            AcquisitionType = acquisitionType,
             OfferOptionId = 1,
             CommercialOfferId = 1,
             Name = "Monthly Subscription",

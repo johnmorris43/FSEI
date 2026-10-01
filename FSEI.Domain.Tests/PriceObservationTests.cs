@@ -226,9 +226,11 @@ public void Validate_WhenOfferOptionIsNotProvided_DoesNotThrow()
 public void Validate_WhenOfferOptionMatches_DoesNotThrow()
 {
     var observation = CreatePriceObservation();
-
+    var acquisitionType = CreateAcquisitionType();
     var option = new OfferOption
     {
+        AcquisitionTypeId = acquisitionType.AcquisitionTypeId,
+        AcquisitionType = acquisitionType,
         OfferOptionId = 1,
         CommercialOfferId = observation.CommercialOfferId,
         Name = "Monthly Subscription",
@@ -245,9 +247,11 @@ public void Validate_WhenOfferOptionMatches_DoesNotThrow()
 public void Validate_WhenOfferOptionIdDoesNotMatchOfferOption_ThrowsInvalidOperationException()
 {
     var observation = CreatePriceObservation();
-
+    var acquisitionType = CreateAcquisitionType();
     var option = new OfferOption
     {
+        AcquisitionTypeId = acquisitionType.AcquisitionTypeId,
+        AcquisitionType = acquisitionType,
         OfferOptionId = 1,
         CommercialOfferId = observation.CommercialOfferId,
         Name = "Monthly Subscription",
@@ -273,9 +277,11 @@ public void Validate_WhenOfferOptionBelongsToDifferentCommercialOffer_ThrowsInva
         Product = observation.CommercialOffer.Product,
         Storefront = observation.CommercialOffer.Storefront
     };
-
+    var acquisitionType = CreateAcquisitionType();
     var option = new OfferOption
     {
+        AcquisitionTypeId = acquisitionType.AcquisitionTypeId,
+        AcquisitionType = acquisitionType,
         OfferOptionId = 1,
         CommercialOfferId = 2,
         Name = "Monthly Subscription",
@@ -292,9 +298,11 @@ public void Validate_WhenOfferOptionBelongsToDifferentCommercialOffer_ThrowsInva
 public void Validate_WhenOfferOptionExistsWithoutOfferOptionId_ThrowsInvalidOperationException()
 {
     var observation = CreatePriceObservation();
-
+    var acquisitionType = CreateAcquisitionType();
     observation.OfferOption = new OfferOption
     {
+        AcquisitionTypeId = acquisitionType.AcquisitionTypeId,
+        AcquisitionType = acquisitionType,
         OfferOptionId = 1,
         CommercialOfferId = observation.CommercialOfferId,
         Name = "Monthly Subscription",
@@ -316,17 +324,21 @@ public void Validate_SameCommercialOfferCanHaveMonthlyAndAnnualPricedOptions()
 
     annualObservation.CommercialOfferId = commercialOffer.CommercialOfferId;
     annualObservation.CommercialOffer = commercialOffer;
-
+    var acquisitionType = CreateAcquisitionType();
     var monthlyOption = new OfferOption
     {
+        AcquisitionTypeId = acquisitionType.AcquisitionTypeId,
+        AcquisitionType = acquisitionType,
         OfferOptionId = 1,
         CommercialOfferId = commercialOffer.CommercialOfferId,
         Name = "Monthly Subscription",
         CommercialOffer = commercialOffer
     };
-
+    
     var annualOption = new OfferOption
     {
+        AcquisitionTypeId = acquisitionType.AcquisitionTypeId,
+        AcquisitionType = acquisitionType,
         OfferOptionId = 2,
         CommercialOfferId = commercialOffer.CommercialOfferId,
         Name = "Annual Subscription",
@@ -376,6 +388,16 @@ public void Validate_SameCommercialOfferCanHaveMonthlyAndAnnualPricedOptions()
             Code = "DE",
             Name = "German Market",
             Region = region
+        };
+    }
+    
+    private static AcquisitionType CreateAcquisitionType()
+    {
+        return new AcquisitionType
+        {
+            AcquisitionTypeId = 1,
+            Code = "PURCHASE",
+            Name = "Purchase"
         };
     }
 }
