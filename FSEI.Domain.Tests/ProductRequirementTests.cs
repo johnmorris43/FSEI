@@ -1,4 +1,3 @@
-
 using FSEI.Domain.Products;
 
 namespace FSEI.Domain.Tests.Products;
@@ -11,11 +10,13 @@ public class ProductRequirementTests
         var product = CreateProduct(1, "757 Extended Upgrade");
         var requiredProduct = CreateProduct(2, "757 Base Product");
 
+        var group = CreateRequirementGroup(product);
+
         var requirement = new ProductRequirement
         {
-            ProductId = product.ProductId,
+            ProductRequirementGroupId = group.ProductRequirementGroupId,
             RequiredProductId = requiredProduct.ProductId,
-            Product = product,
+            ProductRequirementGroup = group,
             RequiredProduct = requiredProduct
         };
 
@@ -27,11 +28,13 @@ public class ProductRequirementTests
     {
         var product = CreateProduct(1, "757 Extended Upgrade");
 
+        var group = CreateRequirementGroup(product);
+
         var requirement = new ProductRequirement
         {
-            ProductId = product.ProductId,
+            ProductRequirementGroupId = group.ProductRequirementGroupId,
             RequiredProductId = product.ProductId,
-            Product = product,
+            ProductRequirementGroup = group,
             RequiredProduct = product
         };
 
@@ -41,6 +44,16 @@ public class ProductRequirementTests
         Assert.That(
             exception!.Message,
             Is.EqualTo("A product cannot require itself."));
+    }
+
+    private static ProductRequirementGroup CreateRequirementGroup(Product product)
+    {
+        return new ProductRequirementGroup
+        {
+            ProductRequirementGroupId = 1,
+            ProductId = product.ProductId,
+            Product = product
+        };
     }
 
     private static Product CreateProduct(int id, string name)

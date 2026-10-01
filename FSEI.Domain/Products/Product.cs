@@ -17,5 +17,5 @@ public class Product
 
     public ICollection<ProductVariant> ProductVariants { get; set; } = [];
     
-    public ICollection<ProductRequirement> ProductRequirements { get; set; } = [];
+    public ICollection<ProductRequirementGroup> RequirementGroups { get; set; } = [];
 }
