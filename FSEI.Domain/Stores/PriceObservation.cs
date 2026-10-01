@@ -11,6 +11,10 @@ public class PriceObservation
     public int CurrencyId { get; set; }
     
     public int? MarketId { get; set; }
+    
+    public int? OfferOptionId { get; set; }
+
+    public OfferOption? OfferOption { get; set; }
 
     public Market? Market { get; set; }
 
@@ -60,6 +64,27 @@ public class PriceObservation
         {
             throw new InvalidOperationException(
                 "A price observation cannot have a Market without a MarketId.");
+        }
+        
+        if (OfferOptionId.HasValue)
+        {
+            if (OfferOption is null ||
+                OfferOptionId.Value != OfferOption.OfferOptionId)
+            {
+                throw new InvalidOperationException(
+                    "A price observation's OfferOptionId must match its OfferOption.");
+            }
+
+            if (OfferOption.CommercialOfferId != CommercialOfferId)
+            {
+                throw new InvalidOperationException(
+                    "A price observation's OfferOption must belong to the same CommercialOffer.");
+            }
+        }
+        else if (OfferOption is not null)
+        {
+            throw new InvalidOperationException(
+                "A price observation cannot have an OfferOption without an OfferOptionId.");
         }
     }
 }

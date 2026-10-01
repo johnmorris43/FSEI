@@ -214,6 +214,152 @@ public class PriceObservationTests
         Assert.Throws<InvalidOperationException>(() => observation.Validate());
     }
     
+    [Test]
+public void Validate_WhenOfferOptionIsNotProvided_DoesNotThrow()
+{
+    var observation = CreatePriceObservation();
+
+    Assert.DoesNotThrow(() => observation.Validate());
+}
+
+[Test]
+public void Validate_WhenOfferOptionMatches_DoesNotThrow()
+{
+    var observation = CreatePriceObservation();
+
+    var option = new OfferOption
+    {
+        OfferOptionId = 1,
+        CommercialOfferId = observation.CommercialOfferId,
+        Name = "Monthly Subscription",
+        CommercialOffer = observation.CommercialOffer
+    };
+
+    observation.OfferOptionId = 1;
+    observation.OfferOption = option;
+
+    Assert.DoesNotThrow(() => observation.Validate());
+}
+
+[Test]
+public void Validate_WhenOfferOptionIdDoesNotMatchOfferOption_ThrowsInvalidOperationException()
+{
+    var observation = CreatePriceObservation();
+
+    var option = new OfferOption
+    {
+        OfferOptionId = 1,
+        CommercialOfferId = observation.CommercialOfferId,
+        Name = "Monthly Subscription",
+        CommercialOffer = observation.CommercialOffer
+    };
+
+    observation.OfferOptionId = 2;
+    observation.OfferOption = option;
+
+    Assert.Throws<InvalidOperationException>(() => observation.Validate());
+}
+
+[Test]
+public void Validate_WhenOfferOptionBelongsToDifferentCommercialOffer_ThrowsInvalidOperationException()
+{
+    var observation = CreatePriceObservation();
+
+    var otherOffer = new CommercialOffer
+    {
+        CommercialOfferId = 2,
+        ProductId = observation.CommercialOffer.ProductId,
+        StorefrontId = observation.CommercialOffer.StorefrontId,
+        Product = observation.CommercialOffer.Product,
+        Storefront = observation.CommercialOffer.Storefront
+    };
+
+    var option = new OfferOption
+    {
+        OfferOptionId = 1,
+        CommercialOfferId = 2,
+        Name = "Monthly Subscription",
+        CommercialOffer = otherOffer
+    };
+
+    observation.OfferOptionId = 1;
+    observation.OfferOption = option;
+
+    Assert.Throws<InvalidOperationException>(() => observation.Validate());
+}
+
+[Test]
+public void Validate_WhenOfferOptionExistsWithoutOfferOptionId_ThrowsInvalidOperationException()
+{
+    var observation = CreatePriceObservation();
+
+    observation.OfferOption = new OfferOption
+    {
+        OfferOptionId = 1,
+        CommercialOfferId = observation.CommercialOfferId,
+        Name = "Monthly Subscription",
+        CommercialOffer = observation.CommercialOffer
+    };
+
+    observation.OfferOptionId = null;
+
+    Assert.Throws<InvalidOperationException>(() => observation.Validate());
+}
+
+[Test]
+public void Validate_SameCommercialOfferCanHaveMonthlyAndAnnualPricedOptions()
+{
+    var monthlyObservation = CreatePriceObservation();
+    var annualObservation = CreatePriceObservation();
+
+    var commercialOffer = monthlyObservation.CommercialOffer;
+
+    annualObservation.CommercialOfferId = commercialOffer.CommercialOfferId;
+    annualObservation.CommercialOffer = commercialOffer;
+
+    var monthlyOption = new OfferOption
+    {
+        OfferOptionId = 1,
+        CommercialOfferId = commercialOffer.CommercialOfferId,
+        Name = "Monthly Subscription",
+        CommercialOffer = commercialOffer
+    };
+
+    var annualOption = new OfferOption
+    {
+        OfferOptionId = 2,
+        CommercialOfferId = commercialOffer.CommercialOfferId,
+        Name = "Annual Subscription",
+        CommercialOffer = commercialOffer
+    };
+
+    monthlyObservation.OfferOptionId = monthlyOption.OfferOptionId;
+    monthlyObservation.OfferOption = monthlyOption;
+    monthlyObservation.Amount = 9.05m;
+
+    annualObservation.OfferOptionId = annualOption.OfferOptionId;
+    annualObservation.OfferOption = annualOption;
+    annualObservation.Amount = 81.64m;
+
+    Assert.Multiple(() =>
+    {
+        Assert.DoesNotThrow(() => monthlyObservation.Validate());
+        Assert.DoesNotThrow(() => annualObservation.Validate());
+
+        Assert.That(
+            monthlyObservation.CommercialOfferId,
+            Is.EqualTo(annualObservation.CommercialOfferId));
+
+        Assert.That(
+            monthlyObservation.OfferOptionId,
+            Is.Not.EqualTo(annualObservation.OfferOptionId));
+
+        Assert.That(
+            monthlyObservation.Amount,
+            Is.Not.EqualTo(annualObservation.Amount));
+    });
+}
+    
     private static Market CreateMarket(int marketId)
     {
         var region = new Region

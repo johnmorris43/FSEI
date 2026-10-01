@@ -19,4 +19,6 @@ public class CommercialOffer
     public required Product Product { get; set; }
 
     public required Storefront Storefront { get; set; }
+    
+    public ICollection<OfferOption> OfferOptions { get; set; } = [];
 }
