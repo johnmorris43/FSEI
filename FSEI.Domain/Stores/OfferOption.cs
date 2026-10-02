@@ -7,6 +7,8 @@ public class OfferOption
     public int CommercialOfferId { get; set; }
     
     public int AcquisitionTypeId { get; set; }
+    
+    public int? BillingIntervalId { get; set; }
 
     public required AcquisitionType AcquisitionType { get; set; }
 
@@ -17,6 +19,8 @@ public class OfferOption
     public bool IsActive { get; set; } = true;
 
     public required CommercialOffer CommercialOffer { get; set; }
+    
+    public BillingInterval? BillingInterval { get; set; }
     
     public void Validate()
     {
@@ -30,6 +34,21 @@ public class OfferOption
         {
             throw new InvalidOperationException(
                 "An offer option's AcquisitionTypeId must match its AcquisitionType.");
+        }
+        
+        if (BillingIntervalId.HasValue)
+        {
+            if (BillingInterval is null ||
+                BillingIntervalId.Value != BillingInterval.BillingIntervalId)
+            {
+                throw new InvalidOperationException(
+                    "An offer option's BillingIntervalId must match its BillingInterval.");
+            }
+        }
+        else if (BillingInterval is not null)
+        {
+            throw new InvalidOperationException(
+                "An offer option cannot have a BillingInterval without a BillingIntervalId.");
         }
     }
 }

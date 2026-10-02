@@ -40,6 +40,65 @@ public class OfferOptionTests
 
         Assert.Throws<InvalidOperationException>(() => option.Validate());
     }
+    
+    [Test]
+    public void Validate_WhenBillingIntervalMatches_DoesNotThrow()
+    {
+        var offerOption = CreateOfferOption();
+
+        offerOption.BillingIntervalId = 1;
+        offerOption.BillingInterval = new BillingInterval
+        {
+            BillingIntervalId = 1,
+            Code = "MONTHLY",
+            Name = "Monthly"
+        };
+
+        Assert.DoesNotThrow(() => offerOption.Validate());
+    }
+    
+    [Test]
+    public void Validate_WhenBillingIntervalDoesNotMatch_ThrowsInvalidOperationException()
+    {
+        var offerOption = CreateOfferOption();
+
+        offerOption.BillingIntervalId = 1;
+        offerOption.BillingInterval = new BillingInterval
+        {
+            BillingIntervalId = 2,
+            Code = "MONTHLY",
+            Name = "Monthly"
+        };
+
+        Assert.Throws<InvalidOperationException>(() => offerOption.Validate());
+    }
+    
+    [Test]
+    public void Validate_WhenBillingIntervalIdExistsWithoutBillingInterval_ThrowsInvalidOperationException()
+    {
+        var offerOption = CreateOfferOption();
+
+        offerOption.BillingIntervalId = 1;
+        offerOption.BillingInterval = null;
+
+        Assert.Throws<InvalidOperationException>(() => offerOption.Validate());
+    }
+    
+    [Test]
+    public void Validate_WhenBillingIntervalExistsWithoutBillingIntervalId_ThrowsInvalidOperationException()
+    {
+        var offerOption = CreateOfferOption();
+
+        offerOption.BillingIntervalId = null;
+        offerOption.BillingInterval = new BillingInterval
+        {
+            BillingIntervalId = 1,
+            Code = "MONTHLY",
+            Name = "Monthly"
+        };
+
+        Assert.Throws<InvalidOperationException>(() => offerOption.Validate());
+    }
 
     private static OfferOption CreateOfferOption()
     {
