@@ -105,6 +105,50 @@ Before submitting code:
 
 Do not weaken existing validation merely to make a test pass.
 
+## Building and Testing FSEI
+
+### Prerequisites
+
+- .NET 10 SDK
+- JetBrains Rider or another compatible .NET development environment
+
+### Build the Solution
+
+From the repository root:
+
+```bash
+dotnet build FSEI.sln
+```
+
+### Run Unit Tests
+
+FSEI uses NUnit for domain unit testing.
+
+Run the complete test suite:
+
+```bash
+dotnet test FSEI.sln
+```
+
+### Running Tests in Rider
+
+1. Open FSEI.sln.
+2. Build the solution.
+3. Open the Unit Tests tool window.
+4. Run all tests in FSEI.Domain.Tests.
+5. Verify that every test passes.
+
+### Development Requirements
+
+Before committing changes:
+
+- The solution must build successfully.
+- All existing tests must pass.
+- New business rules should include appropriate unit tests.
+- Existing tests must not be disabled to bypass failures.
+
+The verified development baseline is 78 passing unit tests as of October 8, 2026.
+
 ## Pull Requests
 
 Pull requests should clearly describe:
