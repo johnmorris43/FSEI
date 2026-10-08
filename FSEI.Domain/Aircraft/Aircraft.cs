@@ -7,5 +7,5 @@ public class Aircraft
     public required string Name { get; set; }
     public string? Notes { get; set; }
     public required Manufacturer Manufacturer { get; set; }
-    public ICollection<Variant> Variants { get; set; } = [];
+    public ICollection<AircraftVariant> Variants { get; set; } = [];
 }

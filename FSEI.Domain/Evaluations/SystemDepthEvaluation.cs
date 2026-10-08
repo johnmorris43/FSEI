@@ -53,7 +53,7 @@ public class SystemsDepthEvaluation
 
     public Aircraft.Aircraft? Aircraft { get; set; }
 
-    public Variant? Variant { get; set; }
+    public AircraftVariant? Variant { get; set; }
 
     public AircraftConfiguration? AircraftConfiguration { get; set; }
     public required EvaluationScope EvaluationScope { get; set; }

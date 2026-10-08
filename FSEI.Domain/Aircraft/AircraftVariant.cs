@@ -1,11 +1,12 @@
 namespace FSEI.Domain.Aircraft;
 
-public class Variant
+public class AircraftVariant
 {
-    public int VariantId { get; set; }
+    public int AircraftVariantId { get; set; }
     public int AircraftId { get; set; }
     public required string Name { get; set; }
     public string? Notes { get; set; }
     public required Aircraft Aircraft { get; set; }   
     public ICollection<AircraftConfiguration> AircraftConfigurations { get; set; } = [];
+    public ICollection<VariantEngine> VariantEngines { get; set; } = [];
 }

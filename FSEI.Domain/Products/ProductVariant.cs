@@ -12,5 +12,5 @@ public class ProductVariant
     public string? Notes { get; set; }
 
     public required Product Product { get; set; }
-    public required Variant Variant { get; set; }
+    public required AircraftVariant AircraftVariant { get; set; }
 }

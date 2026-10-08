@@ -29,7 +29,7 @@ public class Source
 
     public Aircraft.Aircraft? Aircraft { get; set; }
 
-    public Variant? Variant { get; set; }
+    public AircraftVariant? Variant { get; set; }
     
     public ICollection<EvaluationSource> SystemsDepthEvaluations { get; set; } = [];
     public ICollection<AvionicsEvaluationSource> AvionicsEvaluations { get; set; } = [];

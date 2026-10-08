@@ -1,0 +1,40 @@
+# .NET build output
+**/bin/
+**/obj/
+**/TestResults/
+artifacts/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# User-specific settings
+*.user
+*.suo
+*.rsuser
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# NuGet packages
+*.nupkg
+packages/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+appsettings.Development.local.json
