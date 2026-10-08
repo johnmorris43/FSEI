@@ -19,13 +19,7 @@ public class UserProduct
     {
         if (ProductId.HasValue)
         {
-            if (Product == null)
-            {
-                throw new InvalidOperationException(
-                    "A catalog product reference is required when ProductId is provided.");
-            }
-
-            if (Product.ProductId != ProductId.Value)
+            if (Product != null && Product.ProductId != ProductId.Value)
             {
                 throw new InvalidOperationException(
                     "ProductId does not match the referenced catalog product.");

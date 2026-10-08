@@ -35,6 +35,7 @@ public class UserProductTests
 
         Assert.Multiple(() =>
         {
+            Assert.DoesNotThrow(() => userProduct.Validate());
             Assert.That(userProduct.ProductId, Is.EqualTo(product.ProductId));
             Assert.That(userProduct.Product, Is.SameAs(product));
         });
@@ -50,6 +51,7 @@ public class UserProductTests
 
         Assert.Multiple(() =>
         {
+            Assert.DoesNotThrow(() => userProduct.Validate());
             Assert.That(userProduct.Name,
                 Is.EqualTo("Legacy Aircraft Add-on"));
 
@@ -91,13 +93,36 @@ public class UserProductTests
     }
     
     [Test]
-    public void Validate_WhenProductIdExistsButProductIsNull_ThrowsInvalidOperationException()
+    public void Validate_WhenProductIdExistsButProductIsNull_DoesNotThrow()
     {
         var userProduct = new UserProduct
         {
             UserProductId = 3,
             ProductId = 10,
             Name = "My Boeing 777"
+        };
+
+        Assert.DoesNotThrow(() => userProduct.Validate());
+    }
+    [Test]
+    public void Validate_WhenProductExistsWithoutProductId_ThrowsInvalidOperationException()
+    {
+        var userProduct = new UserProduct
+        {
+            UserProductId = 4,
+            Name = "My Boeing 777",
+            Product = new Product
+            {
+                ProductId = 10,
+                ProductTypeId = 1,
+                Name = "FlightFactor 777",
+                ProductType = new ProductType
+                {
+                    ProductTypeId = 1,
+                    Code = "AIRCRAFT",
+                    Name = "Aircraft"
+                }
+            }
         };
 
         Assert.Throws<InvalidOperationException>(
