@@ -97,7 +97,7 @@ public class UserProductTests
     {
         var userProduct = new UserProduct
         {
-            UserProductId = 3,
+            UserProductId = 3, 
             ProductId = 10,
             Name = "My Boeing 777"
         };
