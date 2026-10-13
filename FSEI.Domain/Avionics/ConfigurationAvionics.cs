@@ -7,7 +7,7 @@ public class ConfigurationAvionics
 
     public int AircraftConfigurationId { get; set; }
 
-    public int AvionicsId { get; set; }
+    public int AvionicsSystemId { get; set; }
 
     public string? Role { get; set; }
 
@@ -15,7 +15,7 @@ public class ConfigurationAvionics
 
     public required AircraftConfiguration AircraftConfiguration { get; set; }
 
-    public required Avionics Avionics { get; set; }
-    
-    public ICollection<AvionicsEvaluation>? AvionicsEvaluations { get; set; }
+    public required AvionicsSystem AvionicsSystem { get; set; }
+
+    public ICollection<AvionicsEvaluation>? AvionicsEvaluations { get; set; } = []; 
 }

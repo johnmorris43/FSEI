@@ -8,6 +8,6 @@ public class AvionicsType
 
     public bool IsActive { get; set; } = true;
 
-    public ICollection<Avionics> AvionicsSystems { get; set; } = [];
+    public ICollection<AvionicsSystem> AvionicsSystems { get; set; } = [];
 
 }

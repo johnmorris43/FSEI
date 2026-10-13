@@ -1,8 +1,8 @@
 namespace FSEI.Domain.Avionics;
 
-public class Avionics
+public class AvionicsSystem
 {
-    public int AvionicsId { get; set; }
+    public int AvionicsSystemId { get; set; }
 
     public int AvionicsTypeId { get; set; }
 
