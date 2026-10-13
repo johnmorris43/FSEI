@@ -23,6 +23,11 @@ public class ProductRequirementGroup
             throw new InvalidOperationException(
                 "A product requirement group must contain at least one requirement.");
         }
+
+        foreach (var requirement in Requirements)
+        {
+            requirement.Validate();
+        }
     }
 
     public ICollection<ProductRequirement> Requirements { get; set; } = [];

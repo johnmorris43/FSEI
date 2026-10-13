@@ -7,7 +7,7 @@ public class ProductVariant
     public int ProductVariantId { get; set; }
 
     public int ProductId { get; set; }
-    public int VariantId { get; set; }
+    public int AircraftVariantId { get; set; }
 
     public string? Notes { get; set; }
 

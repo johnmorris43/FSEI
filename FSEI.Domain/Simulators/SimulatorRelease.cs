@@ -8,6 +8,8 @@ public class SimulatorRelease
     public required string Version { get; set; }
     public DateTime? ReleaseDate { get; set; }
     public string? Notes { get; set; }
+    
+    public string? ReleaseChannel { get; set; }
 
     public required Simulator Simulator { get; set; }
 }

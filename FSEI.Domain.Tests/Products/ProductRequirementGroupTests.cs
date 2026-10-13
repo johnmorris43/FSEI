@@ -92,4 +92,20 @@ public class ProductRequirementGroupTests
             Is.EqualTo(
                 "A product requirement group must contain at least one requirement."));
     }
+    
+    [Test]
+    public void Validate_WhenProductRequiresItself_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var product = CreateProduct(1, "777 Upgrade");
+
+        var group = CreateRequirementGroup(product);
+
+        group.Requirements.Add(
+            CreateRequirement(group, product));
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(
+            () => group.Validate());
+    }
 }
