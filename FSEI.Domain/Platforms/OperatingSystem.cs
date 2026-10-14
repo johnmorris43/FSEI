@@ -6,7 +6,6 @@ public class OperatingSystem
     public required string Name { get; set; }
     public string? Version { get; set; }
     public string? Notes { get; set; }
-
     public ICollection<SimulatorOperatingSystemCompatibility> SimulatorOperatingSystemCompatibilities { get; set; } =
         [];
 }

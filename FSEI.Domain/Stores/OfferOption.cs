@@ -19,7 +19,6 @@ public class OfferOption
     public bool IsActive { get; set; } = true;
 
     public required CommercialOffer CommercialOffer { get; set; }
-    
     public BillingInterval? BillingInterval { get; set; }
     
     public void Validate()

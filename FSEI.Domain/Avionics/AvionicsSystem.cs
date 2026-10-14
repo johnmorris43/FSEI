@@ -15,5 +15,6 @@ public class AvionicsSystem
     public string? Notes { get; set; }
 
     public required AvionicsType AvionicsType { get; set; }
+    
     public ICollection<ConfigurationAvionics> ConfigurationAvionics { get; set; } = [];
 }
