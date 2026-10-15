@@ -75,3 +75,13 @@ functionality, navigation, and abnormal/failure behavior.
 
 Some areas may remain marked **Pending** until sufficient evidence has been obtained.
 FSEI does not assume untested functionality.
+
+## License
+
+Copyright (c) 2026 John Morris.
+
+FSEI's original source code is licensed under the GNU General Public License,
+version 3 only (`GPL-3.0-only`). See [LICENSE](LICENSE) for the full terms.
+
+Third-party materials retain their respective rights and licenses; their inclusion
+or reference does not grant additional redistribution rights.

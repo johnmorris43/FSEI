@@ -224,3 +224,10 @@ The goal is to improve the accuracy and usefulness of the project.
 If you are uncertain whether a proposed contribution fits the project, open a GitHub Issue and describe the idea before investing significant development time.
 
 FSEI is being built in the open, and constructive technical discussion is encouraged.
+
+## License
+
+By submitting original source code for inclusion in FSEI, you agree to license
+that contribution under the GNU General Public License, version 3 only
+(`GPL-3.0-only`). See [LICENSE](LICENSE). Contributors retain copyright in
+their contributions and must have the right to submit them.
