@@ -372,6 +372,18 @@ public void Validate_SameCommercialOfferCanHaveMonthlyAndAnnualPricedOptions()
     });
 }
     
+
+[Test]
+public void Validate_WhenOfferOptionIdExistsWithoutOfferOption_ThrowsInvalidOperationException()
+{
+    var observation = CreatePriceObservation();
+
+    observation.OfferOptionId = 1;
+    observation.OfferOption = null;
+
+    Assert.Throws<InvalidOperationException>(() => observation.Validate());
+}
+
     private static Market CreateMarket(int marketId)
     {
         var region = new Region
