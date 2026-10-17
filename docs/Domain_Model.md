@@ -3068,5 +3068,385 @@ Europe
 ├── France
 └── United Kingdom
 
+## 3.11 Payment
 
+### 3.11.1 PaymentMethod
+
+**Namespace:** `FSEI.Domain.Payment`
+
+**Source:** `Payment/PaymentMethod.cs`
+
+**Purpose:**
+
+Represents a payment method available within
+the flight simulation ecosystem.
+
+Provides a common classification for identifying
+payment methods associated with commercial
+transactions or purchasing options.
+
+**Properties:**
+
+- `PaymentMethodId` (int) — Primary key.
+- `Code` (required string) — Payment method code.
+- `Name` (required string) — Payment method name.
+- `Description` (string?, optional) — Additional
+  information describing the payment method.
+- `IsActive` (bool) — Indicates whether the payment
+  method is active. Defaults to true.
+
+**Relationships:**
+
+- No navigation properties are currently defined.
+- Relationships with other domain entities
+  are not established in this class.
+
+**Business rules:**
+
+- Each payment method must have a Code initialized.
+- Each payment method must have a Name initialized.
+- Description is optional.
+- New payment methods are active by default.
+- Payment methods may be deactivated without deletion.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Code and Name are required during C# object initialization.
+- Empty or whitespace-only Code and Name values
+  are not explicitly rejected.
+- Code uniqueness is not enforced by this class.
+
+**Implementation notes:**
+
+- Code and Name use the C# required modifier.
+- IsActive defaults to true.
+- The class contains no navigation collections.
+- No predefined payment method codes are
+  implemented in this class.
+- No database uniqueness constraints are
+  defined in this class.
+
+## 3.12 Platforms
+
+### 3.12.1 ProcessorArchitecture
+
+**Namespace:** `FSEI.Domain.Platforms`
+
+**Source:** `Platforms/ProcessorArchitecture.cs`
+
+**Purpose:**
+
+Represents a processor architecture classification
+used within the flight simulation ecosystem.
+
+Allows FSEI to distinguish simulator compatibility
+based on processor architecture.
+
+Provides a common architecture definition that
+can be associated with multiple simulator
+operating-system compatibility records.
+
+**Properties:**
+
+- `ProcessorArchitectureId` (int) — Primary key.
+- `Code` (required string) — Processor architecture code.
+- `Name` (required string) — Processor architecture name.
+- `Description` (string?, optional) — Additional
+  information describing the processor architecture.
+- `IsActive` (bool) — Indicates whether the processor
+  architecture is active. Defaults to true.
+
+**Relationships:**
+
+- `SimulatorOperatingSystemCompatibilities`
+  (ICollection<SimulatorOperatingSystemCompatibility>)
+  — Simulator operating-system compatibility records
+  associated with this processor architecture.
+
+**Business rules:**
+
+- Each processor architecture must have a Code initialized.
+- Each processor architecture must have a Name initialized.
+- Description is optional.
+- New processor architectures are active by default.
+- Processor architectures may be deactivated without deletion.
+- A processor architecture may be associated with multiple
+  simulator operating-system compatibility records.
+- A processor architecture may exist without any associated
+  compatibility records.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Code and Name are required during C# object initialization.
+- Empty or whitespace-only Code and Name values
+  are not explicitly rejected.
+- Code uniqueness is not enforced by this class.
+- No validation is implemented for Description.
+
+**Implementation notes:**
+
+- Code and Name use the C# required modifier.
+- IsActive defaults to true.
+- SimulatorOperatingSystemCompatibilities is initialized
+  to an empty collection.
+- The navigation collection represents the inverse
+  relationship from SimulatorOperatingSystemCompatibility.
+- ProcessorArchitecture is an optional reference
+  within SimulatorOperatingSystemCompatibility.
+- No predefined processor architecture codes
+  are implemented in this class.
+- No database uniqueness constraints are
+  defined in this class.
+
+
+### 3.12.2 CompatibilityStatus
+
+**Namespace:** `FSEI.Domain.Platforms`
+
+**Source:** `Platforms/CompatibilityStatus.cs`
+
+**Purpose:**
+
+Represents a compatibility status classification
+used within the flight simulation ecosystem.
+
+Provides a common status definition for describing
+simulator compatibility with operating systems
+and processor architectures.
+
+Allows multiple simulator operating-system
+compatibility records to reference the same
+compatibility status.
+
+**Properties:**
+
+- `CompatibilityStatusId` (int) — Primary key.
+- `Code` (required string) — Compatibility status code.
+- `Name` (required string) — Compatibility status name.
+- `Description` (string?, optional) — Additional
+  information describing the compatibility status.
+- `IsActive` (bool) — Indicates whether the compatibility
+  status is active. Defaults to true.
+
+**Relationships:**
+
+- `SimulatorOperatingSystemCompatibilities`
+  (ICollection<SimulatorOperatingSystemCompatibility>)
+  — Simulator operating-system compatibility records
+  associated with this compatibility status.
+
+**Business rules:**
+
+- Each compatibility status must have a Code initialized.
+- Each compatibility status must have a Name initialized.
+- Description is optional.
+- New compatibility statuses are active by default.
+- Compatibility statuses may be deactivated without deletion.
+- A compatibility status may be associated with multiple
+  simulator operating-system compatibility records.
+- A compatibility status may exist without any associated
+  compatibility records.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Code and Name are required during C# object initialization.
+- Empty or whitespace-only Code and Name values
+  are not explicitly rejected.
+- Code uniqueness is not enforced by this class.
+- No validation is implemented for Description.
+
+**Implementation notes:**
+
+- Code and Name use the C# required modifier.
+- IsActive defaults to true.
+- SimulatorOperatingSystemCompatibilities is initialized
+  to an empty collection.
+- The navigation collection represents the inverse
+  relationship from SimulatorOperatingSystemCompatibility.
+- CompatibilityStatus is a required navigation property
+  within SimulatorOperatingSystemCompatibility.
+- No predefined compatibility status codes
+  are implemented in this class.
+- No database uniqueness constraints are
+  defined in this class.
+
+### 3.12.3 SimulatorOperatingSystemCompatibility
+
+**Namespace:** `FSEI.Domain.Platforms`
+
+**Source:** `Platforms/SimulatorOperatingSystemCompatibility.cs`
+
+**Purpose:**
+
+Represents the compatibility relationship between
+a flight simulator and an operating system.
+
+Identifies the compatibility status and optionally
+specifies the processor architecture associated
+with the compatibility record.
+
+Supports simulator release boundaries to identify
+the releases associated with the compatibility
+relationship.
+
+**Properties:**
+
+- `SimulatorOperatingSystemCompatibilityId` (int)
+  — Primary key.
+- `SimulatorId` (int) — Flight simulator reference.
+- `ProcessorArchitectureId` (int?, optional)
+  — Processor architecture reference.
+- `SupportedFromReleaseId` (int?, optional)
+  — Beginning simulator release reference.
+- `SupportedThroughReleaseId` (int?, optional)
+  — Ending simulator release reference.
+- `OperatingSystemId` (int)
+  — Operating system reference.
+- `CompatibilityStatusId` (int)
+  — Compatibility status reference.
+- `Notes` (string?, optional)
+  — Additional compatibility information.
+
+**Relationships:**
+
+- `SupportedFromRelease` (SimulatorRelease?, optional)
+  — Simulator release associated with the beginning
+  of the compatibility range.
+- `SupportedThroughRelease` (SimulatorRelease?, optional)
+  — Simulator release associated with the end
+  of the compatibility range.
+- `ProcessorArchitecture` (ProcessorArchitecture?, optional)
+  — Processor architecture associated with
+  the compatibility record.
+- `CompatibilityStatus` (required CompatibilityStatus)
+  — Classification of the compatibility relationship.
+- `Simulator` (required Simulator)
+  — Flight simulator associated with the record.
+- `OperatingSystem` (required OperatingSystem)
+  — Operating system associated with the record.
+
+**Business rules:**
+
+- Each compatibility record references one simulator.
+- Each compatibility record references one operating system.
+- Each compatibility record references one
+  compatibility status.
+- Processor architecture is optional.
+- Supported-from and supported-through
+  simulator releases are optional.
+- When a supported-from release is provided,
+  it must belong to the referenced simulator.
+- When a supported-through release is provided,
+  it must belong to the referenced simulator.
+- Notes are optional.
+
+**Validation:**
+
+- A custom `ValidateReleaseBoundaries()` method
+  is implemented.
+- The method verifies that SupportedFromRelease,
+  when present, belongs to the simulator identified
+  by SimulatorId.
+- The method verifies that SupportedThroughRelease,
+  when present, belongs to the simulator identified
+  by SimulatorId.
+- A release belonging to another simulator produces
+  an InvalidOperationException.
+- The method does not verify chronological ordering
+  between the beginning and ending releases.
+- The method does not verify that release identifier
+  properties match their navigation properties.
+- The method does not validate compatibility status,
+  processor architecture, or operating system references.
+- No general `Validate()` method is implemented.
+
+**Implementation notes:**
+
+- Simulator, OperatingSystem, and CompatibilityStatus
+  are required navigation properties.
+- ProcessorArchitecture, SupportedFromRelease,
+  and SupportedThroughRelease are nullable
+  navigation properties.
+- Simulator and SimulatorRelease are defined in
+  the FSEI.Domain.Simulators namespace.
+- ProcessorArchitecture, CompatibilityStatus,
+  and OperatingSystem are defined in
+  the FSEI.Domain.Platforms namespace.
+- ValidateReleaseBoundaries() must be invoked explicitly.
+- The class does not automatically execute validation
+  when properties are assigned.
+- Release boundaries are represented through
+  optional foreign-key identifiers and navigation properties.
+- No uniqueness constraints are implemented in this class.
+- Database foreign-key and relationship constraints
+  are not defined in this class.
+
+### 3.12.4 OperatingSystem
+
+**Namespace:** `FSEI.Domain.Platforms`
+
+**Source:** `Platforms/OperatingSystem.cs`
+
+**Purpose:**
+
+Represents an operating system within the
+flight simulation ecosystem.
+
+Provides identifying information about an
+operating system and its optional version.
+
+Supports the association of operating systems
+with simulator compatibility records.
+
+**Properties:**
+
+- `OperatingSystemId` (int) — Primary key.
+- `Name` (required string) — Operating system name.
+- `Version` (string?, optional) — Operating system version.
+- `Notes` (string?, optional) — Additional information
+  about the operating system.
+
+**Relationships:**
+
+- `SimulatorOperatingSystemCompatibilities`
+  (ICollection<SimulatorOperatingSystemCompatibility>)
+  — Simulator compatibility records associated
+  with this operating system.
+
+**Business rules:**
+
+- Each operating system must have a Name initialized.
+- Version is optional.
+- Notes are optional.
+- An operating system may be associated with multiple
+  simulator operating-system compatibility records.
+- An operating system may exist without any associated
+  compatibility records.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name is required during C# object initialization.
+- Empty or whitespace-only Name values
+  are not explicitly rejected.
+- Version format is not validated.
+- Name uniqueness is not enforced by this class.
+
+**Implementation notes:**
+
+- Name uses the C# required modifier.
+- Version and Notes are nullable strings.
+- SimulatorOperatingSystemCompatibilities is initialized
+  to an empty collection.
+- The navigation collection represents the inverse
+  relationship from SimulatorOperatingSystemCompatibility.
+- OperatingSystem is a required navigation property
+  within SimulatorOperatingSystemCompatibility.
+- No predefined operating system names or versions
+  are implemented in this class.
+- No database uniqueness constraints are
+  defined in this class.
 
