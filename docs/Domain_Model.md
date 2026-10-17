@@ -3450,3 +3450,670 @@ with simulator compatibility records.
 - No database uniqueness constraints are
   defined in this class.
 
+## 3.13 Products
+
+### 3.13.1 ProductType
+
+**Namespace:** `FSEI.Domain.Products`
+
+**Source:** `Products/ProductType.cs`
+
+**Purpose:**
+
+Represents a classification used to identify
+different types of products within the
+flight simulation ecosystem.
+
+Provides a common product-type definition
+that can be associated with multiple products.
+
+**Properties:**
+
+- `ProductTypeId` (int) — Primary key.
+- `Code` (required string) — Product type code.
+- `Name` (required string) — Product type name.
+- `Description` (string?, optional) — Additional
+  information describing the product type.
+- `IsActive` (bool) — Indicates whether the product
+  type is active. Defaults to true.
+
+**Relationships:**
+
+- `Products` (ICollection<Product>)
+  — Products associated with this product type.
+
+**Business rules:**
+
+- Each product type must have a Code initialized.
+- Each product type must have a Name initialized.
+- Description is optional.
+- New product types are active by default.
+- Product types may be deactivated without deletion.
+- A product type may be associated with multiple products.
+- A product type may exist without associated products.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Code and Name are required during C# object initialization.
+- Empty or whitespace-only Code and Name values
+  are not explicitly rejected.
+- Code uniqueness is not enforced by this class.
+
+**Implementation notes:**
+
+- Code and Name use the C# required modifier.
+- IsActive defaults to true.
+- Products is initialized to an empty collection.
+- The Products collection represents the inverse
+  relationship from Product.ProductType.
+- ProductType is a required navigation property
+  within the Product class.
+- No predefined product-type codes are
+  implemented in this class.
+- No database uniqueness constraints are
+  defined in this class.
+
+### 3.13.2 Product
+
+**Namespace:** `FSEI.Domain.Products`
+
+**Source:** `Products/Product.cs`
+
+**Purpose:**
+
+Represents an individual product within the
+flight simulation ecosystem.
+
+Associates a product with its product type,
+aircraft variants, requirement groups,
+and commercial offers.
+
+**Properties:**
+
+- `ProductId` (int) — Primary key.
+- `ProductTypeId` (int) — Product type reference.
+- `Name` (required string) — Product name.
+- `Description` (string?, optional) — Product description.
+- `Notes` (string?, optional) — Additional product information.
+- `IsActive` (bool) — Indicates whether the product
+  is active. Defaults to true.
+
+**Relationships:**
+
+- `ProductType` (required ProductType)
+  — Classification associated with the product.
+- `ProductVariants` (ICollection<ProductVariant>)
+  — Aircraft variant associations for the product.
+- `RequirementGroups` (ICollection<ProductRequirementGroup>)
+  — Requirement groups associated with the product.
+- `CommercialOffers` (ICollection<CommercialOffer>)
+  — Commercial offers associated with the product.
+
+**Business rules:**
+
+- Each product must have a Name initialized.
+- Each product references one product type.
+- Description and Notes are optional.
+- New products are active by default.
+- Products may be deactivated without deletion.
+- A product may be associated with multiple
+  aircraft variants.
+- A product may contain multiple requirement groups.
+- A product may have multiple commercial offers.
+- A product may exist without associated variants,
+  requirement groups, or commercial offers.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name is required during C# object initialization.
+- Empty or whitespace-only names are not explicitly rejected.
+- The class does not verify that ProductTypeId
+  matches ProductType.ProductTypeId.
+- Product name uniqueness is not enforced by this class.
+
+**Implementation notes:**
+
+- Name and ProductType use the C# required modifier.
+- IsActive defaults to true.
+- ProductVariants is initialized to an empty collection.
+- RequirementGroups is initialized to an empty collection.
+- CommercialOffers is initialized to an empty collection.
+- ProductType is defined in the Products namespace.
+- CommercialOffer is defined in the Stores namespace.
+- No database foreign-key or uniqueness constraints
+  are defined in this class.
+
+### 3.13.3 ProductVariant
+
+**Namespace:** `FSEI.Domain.Products`
+
+**Source:** `Products/ProductVariant.cs`
+
+**Purpose:**
+
+Represents the relationship between a product
+and an aircraft variant within the flight
+simulation ecosystem.
+
+Allows FSEI to associate products with specific
+aircraft variants while maintaining the aircraft
+variant information separately from the product.
+
+**Properties:**
+
+- `ProductVariantId` (int) — Primary key.
+- `ProductId` (int) — Product reference.
+- `AircraftVariantId` (int) — Aircraft variant reference.
+- `Notes` (string?, optional) — Additional information
+  about the product-variant relationship.
+
+**Relationships:**
+
+- `Product` (required Product)
+  — Product associated with the aircraft variant.
+- `AircraftVariant` (required AircraftVariant)
+  — Aircraft variant associated with the product.
+
+**Business rules:**
+
+- Each ProductVariant record references one product.
+- Each ProductVariant record references one aircraft variant.
+- A product may be associated with multiple aircraft
+  variants through separate ProductVariant records.
+- Notes are optional.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Product and AircraftVariant are required during
+  C# object initialization.
+- The class does not verify that ProductId matches
+  Product.ProductId.
+- The class does not verify that AircraftVariantId
+  matches AircraftVariant.AircraftVariantId.
+- Duplicate product and aircraft variant combinations
+  are not explicitly prevented by this class.
+
+**Implementation notes:**
+
+- ProductVariant is an explicit relationship entity.
+- Product and AircraftVariant are required
+  navigation properties.
+- Product is defined in the FSEI.Domain.Products namespace.
+- AircraftVariant is defined in the
+  FSEI.Domain.Aircraft namespace.
+- Product contains a ProductVariants navigation collection.
+- No uniqueness constraints are implemented in this class.
+- Database foreign-key and relationship constraints
+  are not defined in this class.
+
+### 3.13.4 ProductRequirement
+
+**Namespace:** `FSEI.Domain.Products`
+
+**Source:** `Products/ProductRequirement.cs`
+
+**Purpose:**
+
+Represents an individual product dependency within
+the flight simulation ecosystem.
+
+Associates a required product with a product
+requirement group.
+
+Supports the definition of product prerequisites
+while preventing direct self-dependencies.
+
+**Properties:**
+
+- `ProductRequirementId` (int) — Primary key.
+- `ProductRequirementGroupId` (int)
+  — Product requirement group reference.
+- `RequiredProductId` (int)
+  — Required product reference.
+- `Notes` (string?, optional)
+  — Additional information about the requirement.
+
+**Relationships:**
+
+- `ProductRequirementGroup` (required ProductRequirementGroup)
+  — Requirement group containing this requirement.
+- `RequiredProduct` (required Product)
+  — Product identified as a prerequisite.
+
+**Business rules:**
+
+- Each product requirement belongs to one
+  product requirement group.
+- Each requirement identifies one required product.
+- A product cannot directly require itself.
+- Notes are optional.
+- A requirement group may contain multiple
+  product requirements.
+- Multiple requirements can be associated
+  with the same required product.
+
+**Validation:**
+
+- A custom `Validate()` method is implemented.
+- Validate() compares ProductRequirementGroup.ProductId
+  with RequiredProductId.
+- If both identifiers match, an
+  InvalidOperationException is thrown.
+- Validate() prevents direct self-dependencies.
+- Validate() does not detect indirect or
+  circular dependencies between products.
+- Validate() does not verify that foreign-key
+  identifiers match their navigation properties.
+- Validate() does not explicitly check whether
+  ProductRequirementGroup is null.
+
+**Implementation notes:**
+
+- ProductRequirementGroup and RequiredProduct
+  use the C# required modifier.
+- ProductRequirementGroup is defined in
+  the FSEI.Domain.Products namespace.
+- RequiredProduct is defined in
+  the FSEI.Domain.Products namespace.
+- ProductRequirementGroup contains a Requirements
+  navigation collection.
+- Validate() must be invoked explicitly.
+- ProductRequirementGroup.Validate() invokes
+  Validate() on each contained requirement.
+- No uniqueness constraints are implemented
+  in this class.
+- Database foreign-key and relationship
+  constraints are not defined in this class.
+
+### 3.13.5 ProductRequirementGroup
+
+**Namespace:** `FSEI.Domain.Products`
+
+**Source:** `Products/ProductRequirementGroup.cs`
+
+**Purpose:**
+
+Represents a group of product prerequisites within
+the flight simulation ecosystem.
+
+Allows a product to define a collection of
+acceptable prerequisite products.
+
+Provides functionality for determining whether
+an owned product satisfies the requirement group.
+
+**Properties:**
+
+- `ProductRequirementGroupId` (int) — Primary key.
+- `ProductId` (int) — Product reference.
+- `Description` (string?, optional) — Additional
+  information describing the requirement group.
+
+**Relationships:**
+
+- `Product` (required Product)
+  — Product associated with the requirement group.
+- `Requirements` (ICollection<ProductRequirement>)
+  — Individual product requirements belonging
+  to this requirement group.
+
+**Business rules:**
+
+- Each requirement group belongs to one product.
+- A requirement group must contain at least
+  one product requirement to pass validation.
+- A requirement group may contain multiple
+  product requirements.
+- A requirement group is satisfied when at least
+  one required product is present in the supplied
+  collection of owned product identifiers.
+- A requirement group is not satisfied when none
+  of its required products are owned.
+- Description is optional.
+- Each contained requirement must pass
+  its own validation rules.
+
+**Methods:**
+
+- `IsSatisfiedBy(IEnumerable<int> ownedProductIds)`
+  — Returns true when at least one requirement
+  references a product contained in ownedProductIds.
+  Returns false otherwise.
+
+- `Validate()`
+  — Verifies that the requirement group contains
+  at least one requirement and invokes Validate()
+  on each contained ProductRequirement.
+
+**Validation:**
+
+- A custom `Validate()` method is implemented.
+- Validate() rejects requirement groups
+  containing zero requirements.
+- An empty requirement group produces an
+  InvalidOperationException.
+- Validate() invokes ProductRequirement.Validate()
+  for each requirement.
+- Individual requirement validation prevents
+  direct product self-dependencies.
+- Validate() does not detect indirect
+  circular dependencies between products.
+- Validate() does not verify that ProductId
+  matches Product.ProductId.
+- Validate() must be invoked explicitly.
+
+**Implementation notes:**
+
+- Product uses the C# required modifier.
+- Requirements is initialized to an empty collection.
+- IsSatisfiedBy() uses LINQ Any().
+- Requirement satisfaction uses OR logic:
+  ownership of any one listed required product
+  satisfies the group.
+- IsSatisfiedBy() returns false when Requirements
+  is empty.
+- IsSatisfiedBy() does not invoke Validate().
+- The class does not automatically execute validation
+  when requirements are added or removed.
+- No database foreign-key or uniqueness constraints
+  are defined in this class.
+
+## 3.14 Simulators
+
+### 3.14.1 Simulator
+
+**Namespace:** `FSEI.Domain.Simulators`
+
+**Source:** `Simulators/Simulator.cs`
+
+**Purpose:**
+
+Represents an individual flight simulator within
+the flight simulation ecosystem.
+
+Associates a simulator with its simulator family
+and current status.
+
+Maintains relationships with simulator releases
+and operating-system compatibility records.
+
+**Properties:**
+
+- `SimulatorId` (int) — Primary key.
+- `SimulatorFamilyId` (int) — Simulator family reference.
+- `SimulatorStatusId` (int) — Simulator status reference.
+- `Name` (required string) — Simulator name.
+- `Version` (string?, optional) — Simulator version.
+- `Notes` (string?, optional) — Additional
+  information about the simulator.
+
+**Relationships:**
+
+- `SimulatorStatus` (required SimulatorStatus)
+  — Status associated with the simulator.
+- `SimulatorFamily` (required SimulatorFamily)
+  — Family associated with the simulator.
+- `Releases` (ICollection<SimulatorRelease>)
+  — Individual releases associated with the simulator.
+- `SimulatorOperatingSystemCompatibilities`
+  (ICollection<SimulatorOperatingSystemCompatibility>)
+  — Operating-system compatibility records
+  associated with the simulator.
+
+**Business rules:**
+
+- Each simulator must have a Name initialized.
+- Each simulator references one simulator family.
+- Each simulator references one simulator status.
+- Version and Notes are optional.
+- A simulator may have multiple releases.
+- A simulator may exist without associated releases.
+- A simulator may have multiple operating-system
+  compatibility records.
+- A simulator may exist without associated
+  compatibility records.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name, SimulatorStatus, and SimulatorFamily
+  are required during C# object initialization.
+- Empty or whitespace-only names are not
+  explicitly rejected.
+- The class does not verify that SimulatorFamilyId
+  matches SimulatorFamily.SimulatorFamilyId.
+- The class does not verify that SimulatorStatusId
+  matches SimulatorStatus.SimulatorStatusId.
+- Simulator name uniqueness is not enforced
+  by this class.
+
+**Implementation notes:**
+
+- Name, SimulatorStatus, and SimulatorFamily
+  use the C# required modifier.
+- Releases is initialized to an empty collection.
+- SimulatorOperatingSystemCompatibilities
+  is initialized to an empty collection.
+- SimulatorStatus and SimulatorFamily are defined
+  in the FSEI.Domain.Simulators namespace.
+- SimulatorOperatingSystemCompatibility is defined
+  in the FSEI.Domain.Platforms namespace.
+- SimulatorRelease contains a required Simulator
+  navigation property.
+- SimulatorOperatingSystemCompatibility contains
+  a required Simulator navigation property.
+- No database foreign-key or uniqueness constraints
+  are defined in this class.
+
+### 3.14.2 SimulatorFamily
+
+**Namespace:** `FSEI.Domain.Simulators`
+
+**Source:** `Simulators/SimulatorFamily.cs`
+
+**Purpose:**
+
+Represents a family of flight simulators within
+the flight simulation ecosystem.
+
+Provides a common grouping for related simulators
+while allowing individual simulators and their
+releases to be maintained separately.
+
+**Properties:**
+
+- `SimulatorFamilyId` (int) — Primary key.
+- `Name` (required string) — Simulator family name.
+- `Notes` (string?, optional) — Additional information
+  about the simulator family.
+
+**Relationships:**
+
+- `Simulators` (ICollection<Simulator>)
+  — Simulators associated with this simulator family.
+
+**Business rules:**
+
+- Each simulator family must have a Name initialized.
+- Notes are optional.
+- A simulator family may contain multiple simulators.
+- A simulator family may exist without associated simulators.
+- Each Simulator references one SimulatorFamily.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name is required during C# object initialization.
+- Empty or whitespace-only names are not explicitly rejected.
+- Simulator family name uniqueness is not enforced
+  by this class.
+- No validation is implemented for Notes.
+
+**Implementation notes:**
+
+- Name uses the C# required modifier.
+- Notes is a nullable string.
+- Simulators is initialized to an empty collection.
+- The Simulators collection represents the inverse
+  relationship from Simulator.SimulatorFamily.
+- Simulator contains a required SimulatorFamily
+  navigation property.
+- SimulatorFamily does not define an IsActive property.
+- No predefined simulator families are implemented
+  in this class.
+- No database uniqueness constraints are
+  defined in this class.
+
+### 3.14.3 SimulatorStatus
+
+**Namespace:** `FSEI.Domain.Simulators`
+
+**Source:** `Simulators/SimulatorStatus.cs`
+
+**Purpose:**
+
+Represents a status classification for flight
+simulators within the flight simulation ecosystem.
+
+Provides a common status definition that can
+be associated with multiple simulators.
+
+Allows simulator status information to be
+maintained separately from individual simulators.
+
+**Properties:**
+
+- `SimulatorStatusId` (int) — Primary key.
+- `Code` (required string) — Simulator status code.
+- `Name` (required string) — Simulator status name.
+- `Description` (string?, optional) — Additional
+  information describing the simulator status.
+- `IsActive` (bool) — Indicates whether the simulator
+  status is active. Defaults to true.
+
+**Relationships:**
+
+- `Simulators` (ICollection<Simulator>)
+  — Simulators associated with this status.
+
+**Business rules:**
+
+- Each simulator status must have a Code initialized.
+- Each simulator status must have a Name initialized.
+- Description is optional.
+- New simulator statuses are active by default.
+- Simulator statuses may be deactivated without deletion.
+- A simulator status may be associated with multiple
+  simulators.
+- A simulator status may exist without associated
+  simulators.
+- Each Simulator references one SimulatorStatus.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Code and Name are required during C# object initialization.
+- Empty or whitespace-only Code and Name values
+  are not explicitly rejected.
+- Code uniqueness is not enforced by this class.
+- No validation is implemented for Description.
+
+**Implementation notes:**
+
+- Code and Name use the C# required modifier.
+- IsActive defaults to true.
+- Simulators is initialized to an empty collection.
+- The Simulators collection represents the inverse
+  relationship from Simulator.SimulatorStatus.
+- Simulator contains a required SimulatorStatus
+  navigation property.
+- No predefined simulator status codes are
+  implemented in this class.
+- No database uniqueness constraints are
+  defined in this class.
+
+### 3.14.4 SimulatorRelease
+
+**Namespace:** `FSEI.Domain.Simulators`
+
+**Source:** `Simulators/SimulatorRelease.cs`
+
+**Purpose:**
+
+Represents an individual release of a flight
+simulator within the flight simulation ecosystem.
+
+Allows FSEI to maintain release-specific information
+independently from the parent simulator.
+
+Supports tracking simulator versions, release dates,
+release channels, and additional release notes.
+
+**Properties:**
+
+- `SimulatorReleaseId` (int) — Primary key.
+- `SimulatorId` (int) — Parent simulator reference.
+- `Version` (required string) — Simulator release version.
+- `ReleaseDate` (DateTime?, optional) — Date of release.
+- `Notes` (string?, optional) — Additional release information.
+- `ReleaseChannel` (string?, optional) — Release channel
+  associated with the simulator release.
+
+**Relationships:**
+
+- `Simulator` (required Simulator)
+  — Parent simulator associated with this release.
+
+**Business rules:**
+
+- Each simulator release must have a Version initialized.
+- Each simulator release references one parent simulator.
+- ReleaseDate is optional.
+- Notes are optional.
+- ReleaseChannel is optional.
+- A simulator may have multiple releases.
+- Multiple releases may share the same release channel.
+- A simulator may exist without associated releases.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Version is required during C# object initialization.
+- Empty or whitespace-only version strings are not
+  explicitly rejected.
+- ReleaseDate is not validated against the current date.
+- ReleaseChannel does not have predefined allowed values.
+- The class does not verify that SimulatorId matches
+  Simulator.SimulatorId.
+- Release version uniqueness is not enforced
+  by this class.
+
+**Implementation notes:**
+
+- Version and Simulator use the C# required modifier.
+- ReleaseDate uses nullable DateTime.
+- Notes and ReleaseChannel use nullable strings.
+- Simulator contains a Releases navigation collection.
+- The Releases collection is initialized to empty
+  in the Simulator class.
+- No release-channel enumeration is defined
+  in this class.
+- No predefined simulator releases are implemented.
+- No database foreign-key or uniqueness constraints
+  are defined in this class.
+
+X-Plane 12
+│
+├── Release 12.1
+│     └── Release Channel: Stable
+│
+├── Release 12.2
+│     └── Release Channel: Stable
+│
+└── Release 12.3 Beta
+└── Release Channel: Beta
+
+
