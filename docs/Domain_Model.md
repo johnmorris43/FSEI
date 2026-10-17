@@ -1469,6 +1469,18 @@ Throws InvalidOperationException when:
 - Processor architecture is modeled independently
   from the operating system.
 
+## 3.7 Stores
+
+The Stores domain represents commercial offerings,
+acquisition methods, billing intervals, storefronts,
+accepted payment methods, and historical pricing.
+
+These entities separate flight simulation products
+from their commercial availability and purchasing options.
+
+The domain supports multiple storefronts, acquisition
+arrangements, currencies, and geographic markets.
+
 ### 3.7.1 AcquisitionType
 
 **Namespace:** `FSEI.Domain.Stores`
@@ -1809,5 +1821,691 @@ Throws InvalidOperationException when:
 - Validation does not require navigation properties to be populated.
 - Database foreign-key constraints have not yet been configured.
 - A unique index on StorefrontId and PaymentMethodId is recommended.
+
+## 3.8 Evaluations
+
+The Evaluations domain defines the methodologies,
+components, assessments, and scoring mechanisms
+used to evaluate flight simulation products.
+
+The domain supports versioned evaluation methodologies,
+component-level scoring, aircraft systems-depth
+evaluations, and avionics fidelity evaluations.
+
+Evaluation results are calculated from individual
+component assessments rather than maintained
+as independent, manually entered totals.
+
+Evaluation scopes distinguish between aircraft
+families, individual variants, and aircraft
+configurations.
+
+The domain also supports evaluation evidence,
+scoring guidance, and historical methodology
+versions to provide a structured foundation
+for consistent and traceable evaluations.
+
+
+### 3.8.1 EvaluationMethodology
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/EvaluationMethodology.cs`
+
+**Purpose:**
+
+Represents a methodology used to evaluate components
+within the flight simulation ecosystem.
+
+Provides a common definition for evaluation methodologies
+while allowing their criteria to evolve through
+separately maintained methodology versions.
+
+**Properties:**
+
+- `EvaluationMethodologyId` (int) — Primary key.
+- `Name` (required string) — Methodology name.
+- `Description` (string?, optional) — Additional information.
+- `IsActive` (bool) — Indicates whether the methodology
+  is active. Defaults to true.
+
+**Relationships:**
+
+- `Versions` (ICollection<EvaluationMethodologyVersion>)
+  — Versions associated with this methodology.
+
+**Business rules:**
+
+- Each methodology must have a Name initialized.
+- A methodology may have multiple versions.
+- A methodology may exist without any versions.
+- New methodologies are active by default.
+- A methodology may be deactivated without deleting
+  its associated versions.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- The `required` keyword enforces initialization of Name
+  but does not prevent empty or whitespace-only values.
+
+**Implementation notes:**
+
+- Versions is initialized to an empty collection.
+- Methodology version details are maintained separately
+  through EvaluationMethodologyVersion.
+- Database uniqueness and foreign-key constraints
+  have not yet been configured.
+
+### 3.8.2 EvaluationMethodologyVersion
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/EvaluationMethodologyVersion.cs`
+
+**Purpose:**
+
+Represents a specific version of an evaluation methodology.
+
+Allows evaluation criteria to evolve over time while
+maintaining distinct methodology versions.
+
+Each methodology version contains the evaluation
+components associated with that version.
+
+**Properties:**
+
+- `EvaluationMethodologyVersionId` (int) — Primary key.
+- `EvaluationMethodologyId` (int) — Parent methodology reference.
+- `VersionNumber` (int) — Methodology version number.
+- `EffectiveDate` (DateTime) — Date the version becomes effective.
+- `Notes` (string?, optional) — Additional version information.
+- `IsActive` (bool) — Indicates whether the version is active.
+  Defaults to true.
+
+**Relationships:**
+
+- `EvaluationMethodology` (required EvaluationMethodology)
+  — Parent evaluation methodology.
+- `Components` (ICollection<EvaluationComponent>)
+  — Evaluation components associated with this version.
+
+**Business rules:**
+
+- Each methodology version belongs to one evaluation methodology.
+- A methodology may contain multiple versions.
+- Each version has its own version number.
+- Each version has an effective date.
+- A methodology version may contain multiple evaluation components.
+- A methodology version may exist without any components.
+- New methodology versions are active by default.
+- Previous methodology versions may be retained for historical reference.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- VersionNumber is not currently restricted to positive values.
+- EffectiveDate is not currently checked for an uninitialized value.
+- The class does not enforce unique version numbers
+  within an evaluation methodology.
+
+**Implementation notes:**
+
+- Components is initialized to an empty collection.
+- EvaluationMethodology is a required navigation property.
+- VersionNumber and EffectiveDate are stored directly
+  on the methodology version.
+- Evaluation components are maintained separately
+  through EvaluationComponent.
+- Database foreign-key and uniqueness constraints
+  have not yet been configured.
+
+### 3.8.3 EvaluationComponent
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/EvaluationComponent.cs`
+
+**Purpose:**
+
+Represents an individual scoring component associated
+with a specific evaluation methodology version.
+
+Evaluation components define the criteria used to
+assess systems depth or avionics fidelity.
+
+Each component specifies its maximum possible score
+and may be referenced by multiple assessments.
+
+**Properties:**
+
+- `EvaluationComponentId` (int) — Primary key.
+- `EvaluationMethodologyVersionId` (int) — Parent methodology
+  version reference.
+- `Name` (required string) — Evaluation component name.
+- `MaximumScore` (int) — Maximum score permitted for
+  assessments using this component.
+- `Description` (string?, optional) — Additional information.
+- `IsActive` (bool) — Indicates whether the component is active.
+  Defaults to true.
+
+**Relationships:**
+
+- `EvaluationMethodologyVersion` (required EvaluationMethodologyVersion)
+  — Parent methodology version.
+- `Assessments` (ICollection<EvaluationComponentAssessment>)
+  — Assessments associated with this component.
+
+**Business rules:**
+
+- Each evaluation component belongs to one methodology version.
+- Each component must have a Name initialized.
+- A methodology version may contain multiple components.
+- A component may be used by multiple assessments.
+- A component may exist without any assessments.
+- New evaluation components are active by default.
+- Assessment scores must fall between zero and MaximumScore
+  when assigned through EvaluationComponentAssessment.SetScore().
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- MaximumScore is not currently validated by this class.
+- The class does not prevent negative MaximumScore values.
+- Name initialization is required, but empty or
+  whitespace-only names are not explicitly rejected.
+
+**Implementation notes:**
+
+- Assessments is initialized to an empty collection.
+- EvaluationMethodologyVersion is a required navigation property.
+- MaximumScore is used by EvaluationComponentAssessment
+  to validate individual assessment scores.
+- MaximumScore also contributes to calculated evaluation
+  percentages in SystemsDepthEvaluation and AvionicsEvaluation.
+- Database foreign-key and uniqueness constraints
+  have not yet been configured.
+
+### 3.8.4 EvaluationComponentAssessment
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/EvaluationComponentAssessment.cs`
+
+**Purpose:**
+
+Represents an individual assessment of an evaluation component.
+
+Stores the score and optional commentary associated with
+a component evaluated as part of a systems-depth or
+avionics evaluation.
+
+Ensures that each assessment belongs to exactly one
+evaluation and references a component associated with
+the selected evaluation methodology version.
+
+**Properties:**
+
+- `EvaluationComponentAssessmentId` (int) — Primary key.
+- `AvionicsEvaluationId` (int?, optional) — Avionics evaluation reference.
+- `SystemsDepthEvaluationId` (int?, optional) — Systems-depth evaluation reference.
+- `EvaluationComponentId` (int) — Evaluation component reference.
+- `Score` (int?, private setter) — Individual component score.
+- `Commentary` (string?, optional) — Assessment commentary.
+
+**Relationships:**
+
+- `EvaluationComponent` (required EvaluationComponent)
+  — Component being assessed.
+- `AvionicsEvaluation` (AvionicsEvaluation?, optional)
+  — Associated avionics evaluation.
+- `SystemsDepthEvaluation` (SystemsDepthEvaluation?, optional)
+  — Associated systems-depth evaluation.
+
+**Business rules:**
+
+- Each assessment references one evaluation component.
+- An assessment must belong to exactly one evaluation.
+- The assessment may belong to either a systems-depth
+  evaluation or an avionics evaluation, but not both.
+- An assessment cannot exist without an evaluation assignment
+  when ValidateEvaluationAssignment() is invoked.
+- Score is optional and may remain null.
+- Assigned scores must fall between zero and the
+  associated evaluation component's MaximumScore.
+- The evaluation component must belong to the
+  specified evaluation methodology version.
+- Commentary is optional.
+
+**Methods:**
+
+`SetScore(int? score)`
+
+- Accepts a nullable integer score.
+- Allows the score to be cleared by assigning null.
+- Rejects scores below zero.
+- Rejects scores exceeding EvaluationComponent.MaximumScore.
+- Throws ArgumentOutOfRangeException for invalid scores.
+
+`ValidateMethodologyVersion(
+    EvaluationMethodologyVersion evaluationMethodologyVersion)`
+
+- Verifies that EvaluationComponent.EvaluationMethodologyVersionId
+  matches the supplied methodology version identifier.
+- Throws InvalidOperationException when the identifiers differ.
+
+`ValidateEvaluationAssignment()`
+
+- Verifies that exactly one evaluation identifier is populated.
+- Rejects assessments assigned to neither evaluation type.
+- Rejects assessments assigned to both evaluation types.
+- Throws InvalidOperationException for invalid assignments.
+
+`Validate(
+    EvaluationMethodologyVersion evaluationMethodologyVersion)`
+
+- Calls ValidateEvaluationAssignment().
+- Calls ValidateMethodologyVersion().
+- Ensures both validation checks are performed.
+
+**Implementation notes:**
+
+- Score uses a private setter and is assigned through SetScore().
+- Score validation uses the associated EvaluationComponent.MaximumScore.
+- Validation methods must be invoked explicitly.
+- Evaluation assignment validation checks the nullable
+  foreign-key identifiers rather than navigation properties.
+- Methodology version validation checks the component's
+  methodology version identifier.
+- Database foreign-key and relationship constraints
+  have not yet been configured.
+
+### 3.8.5 EvaluationScope
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/EvaluationScope.cs`
+
+**Purpose:**
+
+Defines the scope used to identify the level at which
+a systems-depth evaluation is performed.
+
+Allows FSEI to distinguish evaluations performed at
+the aircraft family, aircraft variant, or aircraft
+configuration level.
+
+**Properties:**
+
+- `EvaluationScopeId` (int) — Primary key.
+- `Name` (required string) — Evaluation scope display name.
+- `Code` (required string) — Evaluation scope identifier.
+- `IsActive` (bool) — Indicates whether the scope is active.
+  Defaults to true.
+
+**Relationships:**
+
+- `SystemsDepthEvaluations` (ICollection<SystemsDepthEvaluation>)
+  — Systems-depth evaluations associated with this scope.
+
+**Business rules:**
+
+- Each evaluation scope must have a Name initialized.
+- Each evaluation scope must have a Code initialized.
+- A scope may be associated with multiple systems-depth evaluations.
+- A scope may exist without associated evaluations.
+- New evaluation scopes are active by default.
+- SystemsDepthEvaluation.ValidateEvaluationTarget()
+  recognizes the following scope codes:
+  - AIRCRAFT_FAMILY
+  - VARIANT
+  - CONFIGURATION
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name and Code are required during C# object initialization.
+- Empty or whitespace-only values are not explicitly rejected.
+- Code uniqueness is not currently enforced by this class.
+- The class itself does not restrict Code to predefined values.
+
+**Implementation notes:**
+
+- SystemsDepthEvaluations is initialized to an empty collection.
+- EvaluationScope is referenced by SystemsDepthEvaluation.
+- Scope-to-target consistency is validated by
+  SystemsDepthEvaluation.ValidateEvaluationTarget().
+- Unknown scope codes are rejected by that method.
+- Database foreign-key and uniqueness constraints
+  have not yet been configured.
+
+### 3.8.6 SystemsDepthEvaluation
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/SystemDepthEvaluation.cs`
+
+**Purpose:**
+
+Represents a systems-depth evaluation performed against
+a real-world aircraft, aircraft variant, or aircraft
+configuration.
+
+Associates the evaluation with a specific methodology
+version and evaluation scope.
+
+Calculates an overall systems-depth percentage from
+individual component assessments.
+
+**Properties:**
+
+- `SystemsDepthEvaluationId` (int) — Primary key.
+- `EvaluationMethodologyVersionId` (int) — Methodology version reference.
+- `EvaluationScopeId` (int) — Evaluation scope reference.
+- `AircraftId` (int?, optional) — Aircraft reference.
+- `VariantId` (int?, optional) — Aircraft variant reference.
+- `AircraftConfigurationId` (int?, optional) — Aircraft configuration reference.
+- `SystemsDepthScore` (int?, calculated) — Overall systems-depth percentage.
+- `DateVerified` (DateTime?, optional) — Date the evaluation was verified.
+- `Notes` (string?, optional) — Additional evaluation information.
+
+**Relationships:**
+
+- `Aircraft` (Aircraft?, optional) — Aircraft being evaluated.
+- `Variant` (AircraftVariant?, optional) — Aircraft variant being evaluated.
+- `AircraftConfiguration` (AircraftConfiguration?, optional)
+  — Aircraft configuration being evaluated.
+- `EvaluationScope` (required EvaluationScope)
+  — Scope of the evaluation.
+- `EvaluationMethodologyVersion` (required EvaluationMethodologyVersion)
+  — Methodology version used for the evaluation.
+- `Sources` (ICollection<EvaluationSource>)
+  — Supporting evaluation evidence relationships.
+- `Assessments` (ICollection<EvaluationComponentAssessment>)
+  — Component assessments contributing to the score.
+
+**Business rules:**
+
+- Each systems-depth evaluation references one methodology version.
+- Each systems-depth evaluation references one evaluation scope.
+- An evaluation must target exactly one of the following:
+  - Aircraft
+  - AircraftVariant
+  - AircraftConfiguration
+- The selected evaluation target must match the evaluation scope.
+- An evaluation may contain multiple component assessments.
+- Only assessments containing a score contribute to SystemsDepthScore.
+- The calculated score is expressed as a percentage.
+- SystemsDepthScore is null when no assessments have scores.
+- SystemsDepthScore is null when the combined maximum
+  possible score of evaluated assessments equals zero.
+- DateVerified and Notes are optional.
+
+**Calculated properties:**
+
+`SystemsDepthScore`
+
+- Selects assessments where Score contains a value.
+- Calculates the sum of the assigned assessment scores.
+- Calculates the sum of their associated component maximum scores.
+- Divides the total assigned score by the total maximum score.
+- Multiplies the result by 100.
+- Rounds to the nearest integer using
+  MidpointRounding.AwayFromZero.
+- Returns null when no scored assessments exist.
+- Returns null when the combined maximum score equals zero.
+
+**Validation:**
+
+`ValidateEvaluationTarget()`
+
+Throws InvalidOperationException when:
+
+1. No evaluation target identifier is populated.
+2. More than one evaluation target identifier is populated.
+3. EvaluationScope.Code contains an unrecognized value.
+4. The populated evaluation target does not match
+   the selected evaluation scope.
+
+Recognized scope codes:
+
+- `AIRCRAFT_FAMILY` — Requires AircraftId.
+- `VARIANT` — Requires VariantId.
+- `CONFIGURATION` — Requires AircraftConfigurationId.
+
+**Implementation notes:**
+
+- SystemsDepthScore is calculated dynamically and has no setter.
+- The calculation uses only assessments with populated scores.
+- Sources and Assessments are initialized to empty collections.
+- EvaluationScope and EvaluationMethodologyVersion are
+  required navigation properties.
+- Aircraft, Variant, and AircraftConfiguration navigations
+  are nullable.
+- ValidateEvaluationTarget() must be invoked explicitly.
+- Target validation checks the populated foreign-key identifiers.
+- The current method does not verify that populated target
+  navigation properties match their corresponding identifiers.
+- The current method does not validate methodology-version
+  consistency for individual component assessments.
+- Database foreign-key and relationship constraints
+  have not yet been configured.
+
+### 3.8.7 SystemsDepthScoreGuidance
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/SystemDepthScoringGuide.cs`
+
+**Purpose:**
+
+Defines descriptive scoring guidance for systems-depth
+evaluations.
+
+Associates a score range with a label and description
+to provide consistent interpretation of evaluation scores.
+
+**Properties:**
+
+- `SystemsDepthScoreGuidanceId` (int) — Primary key.
+- `MinimumScore` (int) — Lower boundary of the score range.
+- `MaximumScore` (int) — Upper boundary of the score range.
+- `Label` (required string) — Descriptive scoring label.
+- `Description` (required string) — Explanation of the scoring range.
+- `IsActive` (bool) — Indicates whether the guidance record
+  is active. Defaults to true.
+
+**Relationships:**
+
+- No navigation properties are currently defined.
+- No direct relationship to SystemsDepthEvaluation
+  is implemented in this class.
+
+**Business rules:**
+
+- Each guidance record defines a minimum and maximum score.
+- Each guidance record requires a Label and Description
+  during C# object initialization.
+- New guidance records are active by default.
+- Guidance records may be deactivated without deletion.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- MinimumScore and MaximumScore are not currently
+  validated by this class.
+- The class does not enforce MinimumScore <= MaximumScore.
+- The class does not prevent overlapping score ranges.
+- Label and Description are required during initialization,
+  but empty or whitespace-only values are not explicitly rejected.
+
+**Implementation notes:**
+
+- SystemsDepthScoreGuidance is a standalone domain entity.
+- Score ranges are represented using integer values.
+- The class does not currently contain logic for
+  selecting guidance based on a calculated evaluation score.
+- The class does not define a scoring scale or enforce
+  specific minimum and maximum boundaries.
+- Database constraints have not yet been configured.
+
+### 3.8.8 AvionicsEvaluation
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/AvionicsEvaluation.cs`
+
+**Purpose:**
+
+Represents an evaluation of avionics fidelity associated
+with a specific aircraft configuration and avionics system.
+
+Associates the evaluation with a methodology version
+and calculates an overall fidelity percentage from
+individual component assessments.
+
+Supports evidence-based evaluation through associated
+evaluation sources.
+
+**Properties:**
+
+- `AvionicsEvaluationId` (int) — Primary key.
+- `ConfigurationAvionicsId` (int) — Aircraft configuration
+  avionics relationship reference.
+- `EvaluationMethodologyVersionId` (int) — Methodology
+  version reference.
+- `EvaluationDate` (DateTime?, optional) — Evaluation date.
+- `FidelityScore` (int?, calculated) — Overall avionics
+  fidelity percentage.
+- `Notes` (string?, optional) — Additional evaluation information.
+
+**Relationships:**
+
+- `ConfigurationAvionics` (required ConfigurationAvionics)
+  — Aircraft configuration and avionics association.
+- `EvaluationMethodologyVersion` (required EvaluationMethodologyVersion)
+  — Methodology version used for the evaluation.
+- `Sources` (ICollection<AvionicsEvaluationSource>)
+  — Supporting evaluation evidence relationships.
+- `Assessments` (ICollection<EvaluationComponentAssessment>)
+  — Component assessments contributing to the fidelity score.
+
+**Business rules:**
+
+- Each avionics evaluation references one ConfigurationAvionics record.
+- Each avionics evaluation references one methodology version.
+- An evaluation may contain multiple component assessments.
+- Only assessments containing a score contribute to FidelityScore.
+- The calculated fidelity score is expressed as a percentage.
+- FidelityScore is null when no assessments have scores.
+- FidelityScore is null when the combined maximum
+  possible score of evaluated assessments equals zero.
+- EvaluationDate and Notes are optional.
+- An avionics evaluation may have multiple supporting sources.
+
+**Calculated properties:**
+
+`FidelityScore`
+
+- Selects assessments where Score contains a value.
+- Calculates the sum of the assigned assessment scores.
+- Calculates the sum of their associated component maximum scores.
+- Divides the total assigned score by the total maximum score.
+- Multiplies the result by 100.
+- Rounds to the nearest integer using
+  MidpointRounding.AwayFromZero.
+- Returns null when no scored assessments exist.
+- Returns null when the combined maximum score equals zero.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- The class does not directly validate methodology-version
+  consistency for individual component assessments.
+- The class does not directly validate that
+  ConfigurationAvionicsId matches the associated
+  ConfigurationAvionics navigation property.
+- Assessment-level validation is implemented separately
+  through EvaluationComponentAssessment.
+
+**Implementation notes:**
+
+- FidelityScore is calculated dynamically and has no setter.
+- The calculation uses only assessments with populated scores.
+- Sources and Assessments are initialized to empty collections.
+- ConfigurationAvionics and EvaluationMethodologyVersion
+  are required navigation properties.
+- The class does not store a separate calculated score.
+- Evidence relationships are maintained through
+  AvionicsEvaluationSource.
+- Database foreign-key and relationship constraints
+  have not yet been configured.
+
+### 3.8.9 AvionicsEvaluationSource
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/AvionicsEvaluationSource.cs`
+
+**Purpose:**
+
+Represents the relationship between an avionics evaluation
+and a supporting evidence source.
+
+Allows FSEI to associate evidence with avionics evaluations
+while identifying the role that each source plays in
+supporting the evaluation.
+
+**Properties:**
+
+- `AvionicsEvaluationSourceId` (int) — Primary key.
+- `AvionicsEvaluationId` (int) — Avionics evaluation reference.
+- `SourceId` (int) — Supporting evidence source reference.
+- `EvidenceRoleId` (int) — Evidence role reference.
+- `Notes` (string?, optional) — Additional information
+  about the evidence relationship.
+
+**Relationships:**
+
+- `AvionicsEvaluation` (required AvionicsEvaluation)
+  — Avionics evaluation associated with the evidence.
+- `Source` (required Source)
+  — Supporting evidence source.
+- `EvidenceRole` (required EvidenceRole)
+  — Classification of the evidence relationship.
+
+**Business rules:**
+
+- Each record associates one avionics evaluation
+  with one supporting evidence source.
+- Each record references an evidence role.
+- An avionics evaluation may have multiple
+  supporting evidence relationships.
+- A source may be associated with multiple
+  avionics evaluations through separate records.
+- Notes are optional.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- The class does not verify that foreign-key identifiers
+  match their associated navigation properties.
+- Required navigation properties must be initialized,
+  but relationship consistency is not validated
+  directly by this class.
+
+**Implementation notes:**
+
+- AvionicsEvaluationSource is an explicit relationship entity.
+- AvionicsEvaluation, Source, and EvidenceRole
+  are required navigation properties.
+- Source and EvidenceRole are defined in
+  the FSEI.Domain.Evidence namespace.
+- Evidence relationships are maintained separately
+  from evaluation component assessments.
+- No uniqueness constraints are implemented in this class.
+- Database foreign-key and relationship constraints
+  have not yet been configured.
+
 
 
