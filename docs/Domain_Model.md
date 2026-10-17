@@ -2507,5 +2507,336 @@ supporting the evaluation.
 - Database foreign-key and relationship constraints
   have not yet been configured.
 
+## 3.9 Evidence
+
+### 3.9.1 EvidenceRole
+
+**Namespace:** `FSEI.Domain.Evidence`
+
+**Source:** `Evidence/EvidenceRole.cs`
+
+**Purpose:**
+
+Defines the role that an evidence source plays in
+supporting a systems-depth or avionics evaluation.
+
+Provides a common classification for evidence
+relationships across evaluation types.
+
+**Properties:**
+
+- `EvidenceRoleId` (int) — Primary key.
+- `Name` (required string) — Evidence role name.
+- `IsActive` (bool) — Indicates whether the evidence
+  role is active. Defaults to true.
+
+**Relationships:**
+
+- `SystemsDepthEvaluations` (ICollection<EvaluationSource>)
+  — Systems-depth evaluation evidence relationships
+  associated with this role.
+- `AvionicsEvaluationSources` (ICollection<AvionicsEvaluationSource>)
+  — Avionics evaluation evidence relationships
+  associated with this role.
+
+**Business rules:**
+
+- Each evidence role must have a Name initialized.
+- An evidence role may be associated with multiple
+  systems-depth evaluation evidence relationships.
+- An evidence role may be associated with multiple
+  avionics evaluation evidence relationships.
+- An evidence role may exist without any associated
+  evaluation evidence relationships.
+- New evidence roles are active by default.
+- Evidence roles may be deactivated without deletion.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name is required during C# object initialization.
+- Empty or whitespace-only names are not explicitly rejected.
+- Name uniqueness is not currently enforced by this class.
+
+**Implementation notes:**
+
+- SystemsDepthEvaluations is initialized to an empty collection.
+- AvionicsEvaluationSources is initialized to an empty collection.
+- Both navigation collections reference relationship entities
+  defined in the FSEI.Domain.Evaluations namespace.
+- EvidenceRole does not directly reference
+  SystemsDepthEvaluation or AvionicsEvaluation.
+- Evidence relationships are maintained through
+  EvaluationSource and AvionicsEvaluationSource.
+- Database foreign-key and uniqueness constraints
+  are not defined in this class.
+
+### 3.9.2 EvidenceScope
+
+**Namespace:** `FSEI.Domain.Evidence`
+
+**Source:** `Evidence/EvidenceScope.cs`
+
+**Purpose:**
+
+Represents a classification used to define the
+scope associated with an evidence source.
+
+Allows evidence sources to be grouped according
+to their assigned evidence scope.
+
+**Properties:**
+
+- `EvidenceScopeId` (int) — Primary key.
+- `Name` (required string) — Evidence scope name.
+- `IsActive` (bool) — Indicates whether the evidence
+  scope is active. Defaults to true.
+
+**Relationships:**
+
+- `Sources` (ICollection<Source>)
+  — Evidence sources associated with this scope.
+
+**Business rules:**
+
+- Each evidence scope must have a Name initialized.
+- An evidence scope may be associated with multiple sources.
+- An evidence scope may exist without associated sources.
+- New evidence scopes are active by default.
+- Evidence scopes may be deactivated without deletion.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name is required during C# object initialization.
+- Empty or whitespace-only names are not explicitly rejected.
+- Name uniqueness is not currently enforced by this class.
+
+**Implementation notes:**
+
+- Sources is initialized to an empty collection.
+- EvidenceScope is referenced by Source.
+- EvidenceScope does not currently define
+  predefined scope codes or values.
+- The class does not contain logic for determining
+  which evidence scope applies to a source.
+- Database foreign-key and uniqueness constraints
+  are not defined in this class.
+
+### 3.9.3 EvaluationSource
+
+**Namespace:** `FSEI.Domain.Evaluations`
+
+**Source:** `Evaluations/EvidenceSource.cs`
+
+**Purpose:**
+
+Represents the relationship between a systems-depth
+evaluation and a supporting evidence source.
+
+Allows FSEI to associate evidence with systems-depth
+evaluations while identifying the role that each
+source plays in supporting the evaluation.
+
+**Properties:**
+
+- `EvaluationSourceId` (int) — Primary key.
+- `SystemsDepthEvaluationId` (int) — Systems-depth
+  evaluation reference.
+- `SourceId` (int) — Supporting evidence source reference.
+- `EvidenceRoleId` (int) — Evidence role reference.
+- `Notes` (string?, optional) — Additional information
+  about the evidence relationship.
+
+**Relationships:**
+
+- `SystemsDepthEvaluation` (required SystemsDepthEvaluation)
+  — Systems-depth evaluation associated with the evidence.
+- `Source` (required Source)
+  — Supporting evidence source.
+- `EvidenceRole` (required EvidenceRole)
+  — Classification of the evidence relationship.
+
+**Business rules:**
+
+- Each record associates one systems-depth evaluation
+  with one supporting evidence source.
+- Each record references an evidence role.
+- A systems-depth evaluation may have multiple
+  supporting evidence relationships.
+- A source may be associated with multiple
+  systems-depth evaluations through separate records.
+- Notes are optional.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- The class does not verify that foreign-key identifiers
+  match their associated navigation properties.
+- Required navigation properties must be initialized,
+  but relationship consistency is not validated
+  directly by this class.
+
+**Implementation notes:**
+
+- EvaluationSource is an explicit relationship entity.
+- SystemsDepthEvaluation, Source, and EvidenceRole
+  are required navigation properties.
+- Source and EvidenceRole are defined in
+  the FSEI.Domain.Evidence namespace.
+- SystemsDepthEvaluation is defined in
+  the FSEI.Domain.Evaluations namespace.
+- Evidence relationships are maintained separately
+  from evaluation component assessments.
+- No uniqueness constraints are implemented in this class.
+- Database foreign-key and relationship constraints
+  are not defined in this class.
+
+### 3.9.4 Source
+
+**Namespace:** `FSEI.Domain.Evidence`
+
+**Source:** `Evidence/Source.cs`
+
+**Purpose:**
+
+Represents a supporting evidence source used within
+the flight simulation ecosystem.
+
+Provides information about the source, its type,
+its evidence scope, and its optional association
+with an aircraft or aircraft variant.
+
+Supports evidence-based systems-depth and avionics
+evaluations through separate relationship entities.
+
+**Properties:**
+
+- `SourceId` (int) — Primary key.
+- `SourceTypeId` (int) — Source type reference.
+- `EvidenceScopeId` (int) — Evidence scope reference.
+- `AircraftId` (int?, optional) — Aircraft reference.
+- `VariantId` (int?, optional) — Aircraft variant reference.
+- `Name` (required string) — Evidence source name.
+- `Url` (string?, optional) — Source URL.
+- `DateAccessed` (DateTime?, optional) — Date the source
+  was accessed.
+- `Notes` (string?, optional) — Additional source information.
+
+**Relationships:**
+
+- `SourceType` (required SourceType)
+  — Classification of the evidence source.
+- `EvidenceScope` (required EvidenceScope)
+  — Scope associated with the evidence source.
+- `Aircraft` (Aircraft?, optional)
+  — Aircraft associated with the source.
+- `Variant` (AircraftVariant?, optional)
+  — Aircraft variant associated with the source.
+- `SystemsDepthEvaluations` (ICollection<EvaluationSource>)
+  — Systems-depth evaluation evidence relationships.
+- `AvionicsEvaluations` (ICollection<AvionicsEvaluationSource>)
+  — Avionics evaluation evidence relationships.
+
+**Business rules:**
+
+- Each source must have a Name initialized.
+- Each source references one source type.
+- Each source references one evidence scope.
+- AircraftId and VariantId are optional.
+- A source may be associated with an aircraft.
+- A source may be associated with an aircraft variant.
+- A source may exist without an aircraft or variant reference.
+- Url, DateAccessed, and Notes are optional.
+- A source may support multiple systems-depth evaluations.
+- A source may support multiple avionics evaluations.
+- A source may exist without associated evaluations.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name is required during C# object initialization.
+- Empty or whitespace-only names are not explicitly rejected.
+- Url is not validated for URL format.
+- DateAccessed is not validated by this class.
+- The class does not enforce mutual exclusivity
+  between AircraftId and VariantId.
+- The class does not validate consistency between
+  foreign-key identifiers and navigation properties.
+
+**Implementation notes:**
+
+- SourceType and EvidenceScope are required
+  navigation properties.
+- Aircraft and Variant navigation properties are nullable.
+- SystemsDepthEvaluations is initialized
+  to an empty collection.
+- AvionicsEvaluations is initialized
+  to an empty collection.
+- SourceType and EvidenceScope are defined in
+  the FSEI.Domain.Evidence namespace.
+- Aircraft and AircraftVariant are defined in
+  the FSEI.Domain.Aircraft namespace.
+- Systems-depth evidence relationships are maintained
+  through EvaluationSource.
+- Avionics evidence relationships are maintained
+  through AvionicsEvaluationSource.
+- The class does not define uniqueness constraints.
+- Database foreign-key and relationship constraints
+  are not defined in this class.
+
+### 3.9.5 SourceType
+
+**Namespace:** `FSEI.Domain.Evidence`
+
+**Source:** `Evidence/SourceType.cs`
+
+**Purpose:**
+
+Represents a classification used to identify
+the type of an evidence source.
+
+Provides a common source-type definition
+that can be associated with multiple
+supporting evidence sources.
+
+**Properties:**
+
+- `SourceTypeId` (int) — Primary key.
+- `Name` (required string) — Source type name.
+- `IsActive` (bool) — Indicates whether the source
+  type is active. Defaults to true.
+
+**Relationships:**
+
+- `Sources` (ICollection<Source>)
+  — Evidence sources associated with this source type.
+
+**Business rules:**
+
+- Each source type must have a Name initialized.
+- A source type may be associated with multiple sources.
+- A source type may exist without associated sources.
+- New source types are active by default.
+- Source types may be deactivated without deletion.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Name is required during C# object initialization.
+- Empty or whitespace-only names are not explicitly rejected.
+- Name uniqueness is not currently enforced by this class.
+
+**Implementation notes:**
+
+- Sources is initialized to an empty collection.
+- SourceType is referenced by Source.
+- SourceType does not currently define
+  predefined source-type codes or values.
+- The class does not contain logic for determining
+  which source type applies to an evidence source.
+- Database foreign-key and uniqueness constraints
+  are not defined in this class.
+
 
 
