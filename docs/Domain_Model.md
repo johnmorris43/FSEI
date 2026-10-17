@@ -2838,5 +2838,235 @@ supporting evidence sources.
 - Database foreign-key and uniqueness constraints
   are not defined in this class.
 
+## 3.10 GeographicRegions
+
+### 3.10.1 Currency
+
+**Namespace:** `FSEI.Domain.GeographicRegions`
+
+**Source:** `GeographicRegions/Currency.cs`
+
+**Purpose:**
+
+Represents a currency used within the flight
+simulation ecosystem.
+
+Provides a standardized currency identifier
+for geographic and commercial information
+associated with the ecosystem.
+
+**Properties:**
+
+- `CurrencyId` (int) — Primary key.
+- `Code` (required string) — Three-character currency code.
+- `Name` (required string) — Currency name.
+- `Symbol` (string?, optional) — Currency symbol.
+- `Notes` (string?, optional) — Additional currency information.
+- `IsActive` (bool) — Indicates whether the currency
+  is active. Defaults to true.
+
+**Relationships:**
+
+- No navigation properties are currently defined.
+- Currency relationships with other domain entities
+  are not established in this class.
+
+**Business rules:**
+
+- Each currency must have a Code initialized.
+- Each currency must have a Name initialized.
+- Currency codes must contain exactly three characters.
+- Currency codes cannot be null, empty, or whitespace-only.
+- Symbol and Notes are optional.
+- New currencies are active by default.
+- Currencies may be deactivated without deletion.
+
+**Validation:**
+
+- A custom `Validate()` method is implemented.
+- Validate() rejects null, empty, or whitespace-only codes.
+- Validate() rejects codes that do not contain
+  exactly three characters.
+- Invalid codes produce an InvalidOperationException.
+- Validate() does not enforce uppercase currency codes.
+- Validate() does not verify ISO 4217 membership.
+- Validate() does not validate Name.
+- Validate() does not enforce Code uniqueness.
+
+**Implementation notes:**
+
+- Code and Name use the C# required modifier.
+- IsActive defaults to true.
+- Validation must be invoked explicitly;
+  property assignment does not automatically
+  execute Validate().
+- Code length validation uses the string Length property.
+- No navigation collections are defined.
+- No database uniqueness constraints are
+  defined in this class.
+
+### 3.10.2 Market
+
+**Namespace:** `FSEI.Domain.GeographicRegions`
+
+**Source:** `GeographicRegions/Market.cs`
+
+**Purpose:**
+
+Represents a geographic or commercial market
+within the flight simulation ecosystem.
+
+Associates a market with a geographic region
+and provides identifying information used
+to distinguish individual markets.
+
+**Properties:**
+
+- `MarketId` (int) — Primary key.
+- `RegionId` (int) — Geographic region reference.
+- `Code` (required string) — Market code.
+- `Name` (required string) — Market name.
+- `Description` (string?, optional) — Additional
+  information describing the market.
+- `IsActive` (bool) — Indicates whether the market
+  is active. Defaults to true.
+
+**Relationships:**
+
+- `Region` (required Region)
+  — Geographic region associated with the market.
+
+**Business rules:**
+
+- Each market must have a Code initialized.
+- Each market must have a Name initialized.
+- Each market references one geographic region.
+- Market.RegionId must match Market.Region.RegionId.
+- A geographic region may contain multiple markets.
+- Description is optional.
+- New markets are active by default.
+- Markets may be deactivated without deletion.
+
+**Validation:**
+
+- A custom `Validate()` method is implemented.
+- Validate() compares RegionId with Region.RegionId.
+- A mismatch produces an InvalidOperationException.
+- Validate() does not validate Code or Name.
+- Empty or whitespace-only Code and Name values
+  are not explicitly rejected.
+- Code uniqueness is not enforced by this class.
+- Validate() does not explicitly check whether
+  Region is null before accessing Region.RegionId.
+
+**Implementation notes:**
+
+- Code, Name, and Region use the C# required modifier.
+- Region is a required navigation property.
+- RegionId provides the corresponding
+  geographic region identifier.
+- IsActive defaults to true.
+- Validation must be invoked explicitly;
+  property assignment does not automatically
+  execute Validate().
+- Region contains a Markets navigation collection
+  representing the inverse relationship.
+- No database foreign-key or uniqueness constraints
+  are defined in this class.
+
+### 3.10.3 Region
+
+**Namespace:** `FSEI.Domain.GeographicRegions`
+
+**Source:** `GeographicRegions/Region.cs`
+
+**Purpose:**
+
+Represents a geographic region within the
+flight simulation ecosystem.
+
+Supports hierarchical geographic organization
+by allowing regions to contain other regions.
+
+Provides a geographic structure for organizing
+commercial markets associated with the ecosystem.
+
+**Properties:**
+
+- `RegionId` (int) — Primary key.
+- `ParentRegionId` (int?, optional) — Parent region reference.
+- `Code` (required string) — Geographic region code.
+- `Name` (required string) — Geographic region name.
+- `Description` (string?, optional) — Additional
+  information describing the region.
+- `IsActive` (bool) — Indicates whether the region
+  is active. Defaults to true.
+
+**Relationships:**
+
+- `ParentRegion` (Region?, optional)
+  — Parent geographic region.
+- `ChildRegions` (ICollection<Region>)
+  — Geographic regions belonging to this region.
+- `Markets` (ICollection<Market>)
+  — Commercial markets associated with this region.
+
+**Business rules:**
+
+- Each region must have a Code initialized.
+- Each region must have a Name initialized.
+- A region may reference a parent region.
+- A region may exist without a parent region.
+- A region may contain multiple child regions.
+- A region may exist without child regions.
+- A region may contain multiple markets.
+- A region may exist without associated markets.
+- Description is optional.
+- New regions are active by default.
+- Regions may be deactivated without deletion.
+
+**Validation:**
+
+- No custom `Validate()` method is currently implemented.
+- Code and Name are required during C# object initialization.
+- Empty or whitespace-only Code and Name values
+  are not explicitly rejected.
+- ParentRegionId is optional.
+- The class does not verify that ParentRegionId
+  matches ParentRegion.RegionId.
+- The class does not prevent a region from
+  referencing itself as its parent.
+- The class does not detect circular
+  parent-child relationships.
+- Region code uniqueness is not enforced
+  by this class.
+
+**Implementation notes:**
+
+- Code and Name use the C# required modifier.
+- ParentRegionId is nullable.
+- ParentRegion is a nullable navigation property.
+- ChildRegions is initialized to an empty collection.
+- Markets is initialized to an empty collection.
+- ParentRegion and ChildRegions establish a
+  self-referencing geographic hierarchy.
+- Markets represents the inverse relationship
+  of Market.Region.
+- IsActive defaults to true.
+- The class does not impose a maximum
+  geographic hierarchy depth.
+- No database foreign-key or uniqueness
+  constraints are defined in this class.
+
+North America
+└── United States
+├── Southeast
+└── Northeast
+
+Europe
+├── Germany
+├── France
+└── United Kingdom
+
 
 
