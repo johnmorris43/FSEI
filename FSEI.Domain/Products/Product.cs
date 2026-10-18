@@ -1,5 +1,6 @@
 namespace FSEI.Domain.Products;
 using FSEI.Domain.Stores;
+using FSEI.Domain.Releases;
 public class Product
 {
     public int ProductId { get; set; }
@@ -21,4 +22,6 @@ public class Product
     public ICollection<ProductRequirementGroup> RequirementGroups { get; set; } = [];
     
     public ICollection<CommercialOffer> CommercialOffers { get; set; } = [];
+    
+    public ICollection<ProductRelease> Releases { get; set; } = [];
 }
