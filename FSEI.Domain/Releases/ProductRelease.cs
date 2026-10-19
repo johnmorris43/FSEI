@@ -71,5 +71,27 @@ public class ProductRelease
 
     public required Product Product { get; set; }
     
+    private int? _preReleaseNumber;
+
+    public int? PreReleaseNumber
+    {
+        get => _preReleaseNumber;
+
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(PreReleaseNumber),
+                    "Pre-release number cannot be negative.");
+            }
+
+            _preReleaseNumber = value;
+        }
+    }
+    
     public ReleaseStatus ReleaseStatus { get; set; } = ReleaseStatus.Unknown;
+    
+    public ICollection<ReleaseChange> Changes { get; set; }
+        = new List<ReleaseChange>();
 }   
