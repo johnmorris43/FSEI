@@ -4117,3 +4117,201 @@ X-Plane 12
 └── Release Channel: Beta
 
 
+## 3.10 Releases
+
+The Releases domain maintains version history for products within
+the flight simulation ecosystem.
+
+It supports release channels, version components, lifecycle statuses,
+and categorized changes associated with individual product releases.
+
+### 3.10.1 ProductRelease
+
+**Namespace:** `FSEI.Domain.Releases`
+
+**Source:** `Releases/ProductRelease.cs`
+
+**Purpose:**
+
+Represents an individual software release associated with a product.
+
+**Properties:**
+
+| Property | Type | Description |
+|---|---|---|
+| ProductReleaseId | int | Unique release identifier |
+| ProductId | int | Associated product identifier |
+| Version | required string | Complete version designation |
+| MajorVersion | int? | Optional major version |
+| MinorVersion | int? | Optional minor version |
+| PatchVersion | int? | Optional patch version |
+| BuildNumber | string? | Optional build identifier |
+| ReleaseChannel | ReleaseChannel | Release classification |
+| ReleaseDate | DateTime? | Optional release date |
+| ReleaseNotes | string? | Optional release notes |
+| Product | required Product | Associated product |
+| PreReleaseNumber | int? | Optional prerelease iteration |
+| ReleaseStatus | ReleaseStatus | Lifecycle status |
+| Changes | ICollection<ReleaseChange> | Associated release changes |
+
+**Relationships:**
+
+- Product (1) → ProductRelease (many)
+- ProductRelease (1) → ReleaseChange (many)
+
+**User-facing display value:**
+
+`Version`
+
+**Business rules:**
+
+- Each release references one product.
+- Version is required during object initialization.
+- MajorVersion, MinorVersion, PatchVersion, and PreReleaseNumber
+  cannot be negative when populated.
+- ReleaseChannel defaults to Unknown.
+- ReleaseStatus defaults to Unknown.
+- A release may contain multiple change records.
+- BuildNumber and PreReleaseNumber are independent.
+
+**Validation:**
+
+The setters for MajorVersion, MinorVersion, PatchVersion,
+and PreReleaseNumber throw `ArgumentOutOfRangeException`
+when assigned negative values.
+
+**Implementation notes:**
+
+- Nullable version components allow unspecified values.
+- Changes is initialized to an empty collection.
+- Version string consistency with numeric components is not enforced.
+- Release status transition rules are not implemented.
+- Database constraints remain future implementation work.
+
+### 3.10.2 ReleaseChange
+
+**Namespace:** `FSEI.Domain.Releases`
+
+**Source:** `Releases/ReleaseChange.cs`
+
+**Purpose:**
+
+Represents an individual categorized change introduced or recorded
+in a product release.
+
+**Properties:**
+
+| Property | Type | Description |
+|---|---|---|
+| Id | int | Unique change identifier |
+| ProductReleaseId | int | Parent release identifier |
+| ProductRelease | ProductRelease | Parent release navigation |
+| ChangeType | ReleaseChangeType | Change classification |
+| Description | string | Description of the change |
+
+**Relationships:**
+
+- ProductRelease (1) → ReleaseChange (many)
+
+**Business rules:**
+
+- Each change is associated with a product release.
+- ChangeType defaults to Unknown.
+- Description defaults to an empty string.
+- Multiple changes may belong to the same release.
+
+**Validation:**
+
+No custom validation method is currently implemented.
+
+**Implementation notes:**
+
+- ProductRelease is initialized using null-forgiving syntax.
+- Empty descriptions are not rejected.
+- ProductReleaseId and ProductRelease consistency is not validated.
+- The identifier is named Id rather than ReleaseChangeId.
+
+### 3.10.3 ReleaseChannel
+
+**Namespace:** `FSEI.Domain.Releases`
+
+**Source:** `Releases/ReleaseChannel.cs`
+
+**Purpose:**
+
+Classifies the development or distribution channel of a release.
+
+**Enumeration values:**
+
+| Value | Name |
+|---|---|
+| 0 | Unknown |
+| 1 | Alpha |
+| 2 | Beta |
+| 3 | ReleaseCandidate |
+| 4 | Stable |
+| 5 | Experimental |
+
+**Implementation notes:**
+
+- ProductRelease uses this enumeration.
+- Unknown is the default value.
+- No channel transition validation is currently implemented.
+
+### 3.10.4 ReleaseStatus
+
+**Namespace:** `FSEI.Domain.Releases`
+
+**Source:** `Releases/ReleaseStatus.cs`
+
+**Purpose:**
+
+Identifies the lifecycle status of an individual product release.
+
+**Enumeration values:**
+
+| Value | Name |
+|---|---|
+| 0 | Unknown |
+| 1 | Current |
+| 2 | Superseded |
+| 3 | Withdrawn |
+
+**Implementation notes:**
+
+- ProductRelease uses this enumeration.
+- Unknown is the default value.
+- Status changes are currently direct property assignments.
+- No lifecycle transition restrictions are enforced.
+
+### 3.10.5 ReleaseChangeType
+
+**Namespace:** `FSEI.Domain.Releases`
+
+**Source:** `Releases/ReleaseChangeType.cs`
+
+**Purpose:**
+
+Classifies the nature of an individual product release change.
+
+**Enumeration values:**
+
+| Value | Name |
+|---|---|
+| 0 | Unknown |
+| 1 | Feature |
+| 2 | Improvement |
+| 3 | BugFix |
+| 4 | Compatibility |
+| 5 | Performance |
+| 6 | Security |
+| 7 | Documentation |
+| 8 | Deprecation |
+| 9 | Removal |
+
+**Implementation notes:**
+
+- ReleaseChange uses this enumeration.
+- Unknown is the default classification.
+- Descriptions provide the details of individual changes.
+

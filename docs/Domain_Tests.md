@@ -4743,13 +4743,16 @@ the following areas:
 | Evaluations | 21 |
 | Avionics | 4 |
 | User Collections | 5 |
-| **Total** | **79** |
+| Releases | 19 |
+| **Total** | **98** |
 
-Total documented test classes: 13
+Total documented domain areas: 8
 
-Total documented test methods: 79
+Total documented test classes: 14
 
-Total NUnit test cases: 81
+Total documented test methods: 98
+
+Total documented NUnit test cases: 100
 
 ### 5.2 Known Testing Gaps
 
@@ -4793,3 +4796,159 @@ test source files.
 Successful execution of the complete
 test suite must be verified separately.
 
+
+## 4.8 Releases
+
+The Releases domain tracks product version history, release channels, lifecycle statuses, and individual release changes.
+
+Release records support multiple versions of the same product, including stable releases, beta releases, and distinct prerelease iterations.
+
+### 4.8.1 ProductReleaseTests
+
+**Namespace:** `FSEI.Domain.Tests.Releases`  
+**Test Class:** `ProductReleaseTests`  
+**Domain Classes:** `ProductRelease`, `ReleaseChange`  
+**Supporting Enumerations:** `ReleaseChannel`, `ReleaseStatus`, `ReleaseChangeType`  
+**Framework:** NUnit  
+**Number of Tests:** 19
+
+#### Purpose
+
+Verify that product releases preserve version information, support multiple releases per product, track lifecycle status, and maintain release change records.
+
+#### Test 1 — Product_CanHaveMultipleReleases
+
+**Purpose:** Verify that a product can contain multiple release records.
+
+**Expected Result:** Both stable and beta releases are retained in the product's release collection.
+
+#### Test 2 — ProductRelease_PreservesVersionInformation
+
+**Purpose:** Verify that release version information is preserved.
+
+**Expected Result:** The version string, major version, minor version, patch version, and release channel retain their assigned values.
+
+#### Test 3 — ProductRelease_StableAndBetaAreDistinctReleases
+
+**Purpose:** Verify that stable and beta releases can coexist for the same product.
+
+**Expected Result:** Both releases are retained, with different version strings and release channels.
+
+#### Test 4 — ProductRelease_NegativeMajorVersion_ThrowsException
+
+**Purpose:** Prevent negative major version numbers.
+
+**Expected Result:** Assigning a negative major version throws `ArgumentOutOfRangeException`.
+
+#### Test 5 — ProductRelease_NegativeMinorVersion_ThrowsException
+
+**Purpose:** Prevent negative minor version numbers.
+
+**Expected Result:** Assigning a negative minor version throws `ArgumentOutOfRangeException`.
+
+#### Test 6 — ProductRelease_NegativePatchVersion_ThrowsException
+
+**Purpose:** Prevent negative patch version numbers.
+
+**Expected Result:** Assigning a negative patch version throws `ArgumentOutOfRangeException`.
+
+#### Test 7 — ProductRelease_DefaultStatus_IsUnknown
+
+**Purpose:** Verify the default release lifecycle status.
+
+**Expected Result:** A newly created release has `ReleaseStatus.Unknown`.
+
+#### Test 8 — ProductRelease_CanBeMarkedWithdrawn
+
+**Purpose:** Verify that a release can be marked withdrawn.
+
+**Expected Result:** The release status changes from `Current` to `Withdrawn`.
+
+#### Test 9 — ProductRelease_CanBeMarkedSuperseded
+
+**Purpose:** Verify that a release can be marked superseded.
+
+**Expected Result:** The release status changes from `Current` to `Superseded`.
+
+#### Test 10 — ProductRelease_DefaultChannel_IsUnknown
+
+**Purpose:** Verify the default release channel.
+
+**Expected Result:** A release without an explicitly assigned channel has `ReleaseChannel.Unknown`.
+
+#### Test 11 — ProductRelease_CanContainMultipleChanges
+
+**Purpose:** Verify that a release can contain multiple categorized changes.
+
+**Expected Result:** The release retains both feature and bug-fix entries, and their change types match the expected values.
+
+#### Test 12 — ReleaseChange_ReferencesCorrectProductRelease
+
+**Purpose:** Verify the relationship between a release change and its parent release.
+
+**Expected Result:** The change references the intended `ProductRelease`, and the release collection contains that change.
+
+#### Test 13 — ReleaseChange_DefaultChangeType_IsUnknown
+
+**Purpose:** Verify the default change classification.
+
+**Expected Result:** A newly created `ReleaseChange` has `ReleaseChangeType.Unknown`.
+
+#### Test 14 — ReleaseChange_PreservesOriginalDescription
+
+**Purpose:** Verify that a release change preserves its description.
+
+**Expected Result:** The stored description matches the original string.
+
+#### Test 15 — ProductRelease_CanStorePreReleaseNumber
+
+**Purpose:** Verify that prerelease iteration numbers can be stored.
+
+**Expected Result:** The prerelease number, beta channel, and version string retain their assigned values.
+
+#### Test 16 — ProductRelease_NegativePreReleaseNumber_ThrowsException
+
+**Purpose:** Prevent negative prerelease iteration numbers.
+
+**Expected Result:** Assigning a negative prerelease number throws `ArgumentOutOfRangeException`.
+
+#### Test 17 — ProductRelease_DefaultPreReleaseNumber_IsNull
+
+**Purpose:** Verify the default prerelease number.
+
+**Expected Result:** A release without an assigned prerelease number has `PreReleaseNumber == null`.
+
+#### Test 18 — ProductRelease_DifferentBetaIterations_AreDistinct
+
+**Purpose:** Verify that multiple beta iterations can coexist.
+
+**Expected Result:** Both beta releases remain in the product collection, with distinct prerelease numbers and version strings.
+
+#### Test 19 — ProductRelease_BuildNumberAndPreReleaseNumber_AreIndependent
+
+**Purpose:** Verify that build numbers and prerelease numbers are stored independently.
+
+**Expected Result:** Both values retain their assigned values.
+
+#### Coverage Summary
+
+The test class covers:
+
+- Multiple releases per product
+- Version component preservation
+- Negative version component validation
+- Stable and beta release distinction
+- Default release channel and status
+- Withdrawal and supersession status assignments
+- Release change collections and relationships
+- Change type and description preservation
+- Prerelease iteration numbers
+- Build number independence
+
+**Coverage Limitations:**
+
+The current tests do not enforce consistency between the version string and its numerical components, validate lifecycle transition rules, or enforce foreign-key/navigation-property consistency.
+
+These are candidates for future business-rule review and additional tests.
+
+**Test Review Status:** 19 test methods reviewed; all contain assertions. Execution results were not independently verified.
