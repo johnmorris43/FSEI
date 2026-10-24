@@ -50,6 +50,9 @@ public class SystemsDepthEvaluationTests
             "Variant");
 
         evaluation.AircraftId = 1;
+
+        Assert.Throws<InvalidOperationException>(
+            () => evaluation.ValidateEvaluationTarget());
     }
     
     [Test]
@@ -60,6 +63,9 @@ public class SystemsDepthEvaluationTests
             "Configuration");
 
         evaluation.AircraftConfigurationId = 1;
+
+        Assert.DoesNotThrow(
+            () => evaluation.ValidateEvaluationTarget());
     }
     
     [Test]
@@ -70,6 +76,9 @@ public class SystemsDepthEvaluationTests
             "Aircraft Family");
 
         evaluation.AircraftId = 1;
+
+        Assert.DoesNotThrow(
+            () => evaluation.ValidateEvaluationTarget());
     }
     [Test]
     public void ValidateEvaluationTarget_WhenScopeCodeIsUnknown_ThrowsException()
@@ -79,6 +88,9 @@ public class SystemsDepthEvaluationTests
             "Unknown");
 
         evaluation.VariantId = 1;
+
+        Assert.Throws<InvalidOperationException>(
+            () => evaluation.ValidateEvaluationTarget());
     }
     
     [Test]
@@ -219,7 +231,22 @@ public class SystemsDepthEvaluationTests
         return assessment;
     }
     
-    
+    [Test]
+    public void SystemsDepthScore_WhenMaximumPossibleScoreIsZero_ReturnsNull()
+    {
+        var evaluation = CreateEvaluation(
+            "VARIANT",
+            "Variant");
+
+        evaluation.VariantId = 1;
+
+        evaluation.Assessments.Add(
+            CreateAssessment(evaluation, 0, 0));
+
+        Assert.That(
+            evaluation.SystemsDepthScore,
+            Is.Null);
+    }
     
     private static SystemsDepthEvaluation CreateEvaluation(
         string scopeCode,
